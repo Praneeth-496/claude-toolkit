@@ -1,0 +1,82 @@
+# <PROJECT_NAME> — Project Context
+
+## Pointers (read on demand)
+- Heavier background (dataset, hardware, calibration, pipeline contract): `.claude/CONTEXT.md`
+- Custom skills directory: `~/.claude/skills/`
+- Auto-memory index: `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/MEMORY.md`
+
+## Who I am
+<ROLE_AND_AFFILIATION>
+Focus: <DOMAIN_FOCUS>
+
+## What this is
+<ONE_PARAGRAPH_PROJECT_DESCRIPTION>
+
+Current status:
+- <MILESTONE_OR_PHASE_1>
+- <MILESTONE_OR_PHASE_2>
+
+## Architecture
+- <KEY_INPUT_SHAPE_OR_FEATURE_DIM>
+- <KEY_COMPONENTS_OR_MODELS>
+- <SPLIT_OR_DATASET_SIZE>
+- <ARTEFACT_LOCATIONS>  (e.g. saved_models/, results/, experiments/)
+- <LIVE_OR_INFERENCE_ENTRYPOINT>  (delete if not applicable)
+
+## HPC / env  (delete this section if not applicable)
+- Cluster: <CLUSTER_NAME> (user <CLUSTER_USER>)
+- Known partitions: <PARTITIONS>
+- **Partition selection rule:** before submitting, ALWAYS check which partitions are free via `sinfo` / `squeue` over SSH and pick any idle partition whose resources match the job. Do not default to a specific partition just because existing scripts use it.
+- Suggested check:
+  - `sinfo -o "%P %a %l %D %t %C %G"`
+  - `squeue -h -o "%P %T" | sort | uniq -c`
+- Venv: <VENV_ACTIVATE_PATH>
+- Remote host: <HPC_HOST> via ProxyJump <JUMP_HOST>
+- SLURM scripts: <SLURM_SCRIPTS_GLOB>
+- Logs: <LOG_DIR>
+- Scripts are dual-mode: sbatch on HPC, bash locally
+
+## Git
+- Main branch is `<MAIN_BRANCH>`
+- **NEVER run `git commit` or `git push` without explicit permission.** Both are in the deny list in `settings.local.json` and are blocked. Stage changes with `git add`, then stop and ask.
+- `.claude/` is gitignored. `CLAUDE.md`, `CONTEXT.md`, and `settings.local.json` are never pushed.
+
+## File conventions
+- <SCRIPT_NAMING_PATTERN>  (e.g. training scripts numbered 00_, 01_, 02_…)
+- Artefacts: <ARTEFACT_FILE_TYPES>  (e.g. .joblib classical, .pt NN, .npz sequences, .json splits/results)
+- Shell scripts: <SHELL_SCRIPT_PATTERN>  (e.g. run_<verb>_<scope>.sh)
+
+## Auto-memory caveat
+- `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/` may go stale over time
+- Trust current code over memory; run the `refresh-memory` skill to re-derive
+
+## Code style
+- <STYLE_NOTE_1>  (e.g. each pipeline step = one standalone Python file)
+- <STYLE_NOTE_2>  (e.g. config in dedicated files like config.py)
+- <STYLE_NOTE_3>  (e.g. src/ = reusable lib, training/ = entry points)
+- Preserve old variants alongside new (archive/, no_<feature>_ prefix) — do not delete
+- <STYLE_NOTE_4>  (e.g. notebooks mirror training script numbering)
+
+## How to respond
+- Give code first, explain after only if needed
+- No preamble, no "I'll now…" narration
+- Short answers, no padding
+- Prefer standard idioms for the stack (<LIST_PREFERRED_LIBS>)
+- Minimal inline comments unless I ask
+
+## Token saving rules
+- Never repeat my question back
+- Skip "I'll now..." narration
+- Don't summarize what you just did
+- Use /compact when context > 80%
+- Prefer grep before Read; Edit before Write; subagents for large surveys
+
+## Model routing
+- Opus 4.7 → intelligent multi-file reasoning (architecture, thesis/docs rewrites, pipeline orchestration)
+- Sonnet (latest) → small/mechanical skills (verify, rsync, single-file edits)
+- Never use Haiku
+
+## <PROJECT_SPECIFIC_SECTION_1>  (delete if unused — e.g. "Thesis", "Deployment", "Dataset")
+- <KEY_DOC_PATH>
+- <HARD_RULES>  (e.g. no em-dashes, specific citation format)
+- <VERIFICATION_RULES>  (e.g. numbers must trace to results JSON)

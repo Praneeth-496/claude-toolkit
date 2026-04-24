@@ -1,0 +1,82 @@
+# <PROJECT_NAME> — Heavier Project Context
+
+This file is **lazy-loaded**. `CLAUDE.md` is the always-on summary; this file is only opened when the heavier background is needed. Fill in the sections that apply, delete the rest.
+
+---
+
+## Dataset lineage  (delete if no data)
+
+**Primary dataset:** <PATH_TO_DATASET>
+- Size: <ROW_OR_RECORD_COUNT>, <FEATURE_COUNT> features
+- Collected via: <COLLECTION_SCRIPT_PATH>
+- Labelling: <LABELLING_PROCEDURE>
+- State / resumability: <STATE_FILES>
+
+**Quirks or exclusions:**
+- <QUIRK_1>  (e.g. "CS38 is a USB sniffer, not an anchor — excluded from features")
+- <QUIRK_2>
+
+---
+
+## Hardware / external integrations  (delete if not applicable)
+
+- **Bridge / driver:** <SCRIPT_PATH> — CLI: `<INVOCATION_EXAMPLE>`
+- **Broker / transport:** <HOST_OR_PATH>
+- **Packet / message schema:** <SCHEMA_DESCRIPTION>
+- **Helpers:** <HELPER_PATHS>
+
+---
+
+## Geometry / coordinate systems  (delete if not applicable)
+
+- **Map file:** <MAP_PATH>
+- **Convention:** <COORDINATE_CONVENTION>
+- **Origin:** <ORIGIN_DEFINITION>
+- **Room / region definitions:** <DIMENSION_DOC>
+
+---
+
+## Calibration / configuration artefacts  (delete if not applicable)
+
+- **Artefact:** <ARTEFACT_JSON_PATH>
+- **Produced by:** <CALIBRATION_SCRIPT>
+- **Parameters:** <PARAMETER_SCHEMA>
+- **Consumed by:** <CONSUMER_COMPONENT>
+
+---
+
+## Pipeline / component contract
+
+- **Stage 1 input:** <INPUT_SHAPE>
+- **Stage 1 output:** <OUTPUT_SHAPE>  — best model: <BEST_MODEL> (<METRIC>)
+- **Stage 2 input:** <STAGE_2_INPUT>
+- **Stage 2 output:** <STAGE_2_OUTPUT>
+- **Integration notes:** <HOW_STAGES_CONNECT>
+
+---
+
+## Live / runtime pipeline  (delete if not applicable)
+
+- **Entry point:** <SERVER_OR_CLI_PATH> on port <PORT>
+- **Record → replay → metrics:** <FLOW_DESCRIPTION>
+- **Last live result:** <METRIC_SUMMARY>
+
+---
+
+## Style notes / hard rules  (project-specific)
+
+- <RULE_1>  (e.g. "no em-dashes in docs/report/*.tex")
+- <RULE_2>  (e.g. "every number in reports must trace to a JSON in results/")
+- <RULE_3>  (e.g. "figure naming: <major>.<minor>_<description>.png")
+- <RULE_4>
+
+---
+
+## When this file should be read
+
+Claude should open this file when a request involves any of:
+- <TOPIC_1>
+- <TOPIC_2>
+- <TOPIC_3>
+
+For simple edits inside a single module, CLAUDE.md alone is enough — do not pull this file in unnecessarily.
