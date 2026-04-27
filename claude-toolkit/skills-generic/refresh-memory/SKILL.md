@@ -14,14 +14,26 @@ The auto-memory for the current project lives at:
 ```
 ~/.claude/projects/<ENCODED_PROJECT_PATH>/memory/
 ```
-Where `<ENCODED_PROJECT_PATH>` is the current working directory with `/` replaced by `-` and prefixed with `-` (e.g. `/home/user/Documents/foo` → `-home-user-Documents-foo`).
+Where `<ENCODED_PROJECT_PATH>` is the current working directory with **every non-alphanumeric character** (slashes, dots, underscores, hyphens between letters all count) replaced by `-`. The leading `/` becomes a leading `-`.
+
+Examples:
+- `/home/user/Documents/foo`     → `-home-user-Documents-foo`
+- `/home/user/proj.v2`           → `-home-user-proj-v2`
+- `/home/user/my_app`            → `-home-user-my-app`
 
 ## Steps
 
-1. Find the memory directory:
+1. Find the memory directory (handles dots, underscores, etc.):
    ```bash
-   CWD_ENCODED=$(pwd | sed 's|/|-|g')
+   CWD_ENCODED=$(pwd | sed 's/[^A-Za-z0-9]/-/g')
    MEM_DIR="$HOME/.claude/projects/$CWD_ENCODED/memory"
+   if [[ ! -d "$MEM_DIR" ]]; then
+     # Fall back to fuzzy match in case the encoder ever changes.
+     candidate=$(ls "$HOME/.claude/projects/" 2>/dev/null \
+                 | grep -F "$(basename "$(pwd)" | sed 's/[^A-Za-z0-9]/-/g')" \
+                 | head -1)
+     [[ -n "$candidate" ]] && MEM_DIR="$HOME/.claude/projects/$candidate/memory"
+   fi
    ls "$MEM_DIR"
    ```
 

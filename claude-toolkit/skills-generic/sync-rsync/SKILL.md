@@ -32,9 +32,10 @@ If the section is absent or incomplete, ask the user once, then suggest they add
    ```
    Show the user the list of files that would change.
 
-2. Sync `.claude/` separately (usually gitignored but needed on remote for consistent context):
+2. Sync `.claude/` separately (usually gitignored but needed on remote for consistent context). **Exclude `settings.local.json`** — it carries machine-specific permissions/paths that shouldn't ride along to the cluster:
    ```bash
-   rsync -avn ./.claude/ <REMOTE_HOST>:<REMOTE_PATH>/.claude/
+   rsync -avn --exclude='settings.local.json' \
+     ./.claude/ <REMOTE_HOST>:<REMOTE_PATH>/.claude/
    ```
 
 3. **Wait for user confirmation.** Only then drop `-n` and run for real.

@@ -4,6 +4,8 @@
 - Heavier background (dataset, hardware, calibration, pipeline contract): `.claude/CONTEXT.md`
 - Custom skills directory: `~/.claude/skills/`
 - Auto-memory index: `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/MEMORY.md`
+- Toolkit principles & token-budget rules: `<TOOLKIT_PATH>/docs/principles.md`
+- 4-file pattern explanation: `<TOOLKIT_PATH>/docs/4-file-pattern.md`
 
 ## Who I am
 <ROLE_AND_AFFILIATION>
@@ -38,7 +40,7 @@ Current status:
 
 ## Git
 - Main branch is `<MAIN_BRANCH>`
-- **NEVER run `git commit` or `git push` without explicit permission.** Both are in the deny list in `settings.local.json` and are blocked. Stage changes with `git add`, then stop and ask.
+- **NEVER run `git commit` or `git push` without explicit permission.** Both are in the deny list in `settings.local.json` — every invocation prompts the user. Stage changes with `git add`, then stop and ask.
 - `.claude/` is gitignored. `CLAUDE.md`, `CONTEXT.md`, and `settings.local.json` are never pushed.
 
 ## File conventions
@@ -70,11 +72,12 @@ Current status:
 - Don't summarize what you just did
 - Use /compact when context > 80%
 - Prefer grep before Read; Edit before Write; subagents for large surveys
+- No static `CLAUDE_CODE_MAX_OUTPUT_TOKENS` cap is set — long edits/reviews are allowed to use the full per-response budget. The agent runs across as many responses as the task needs; truncating mid-response just forces re-work.
 
 ## Model routing
-- Opus 4.7 → intelligent multi-file reasoning (architecture, thesis/docs rewrites, pipeline orchestration)
+- Opus 4.7 → intelligent multi-file reasoning (architecture, doc rewrites, pipeline orchestration)
 - Sonnet (latest) → small/mechanical skills (verify, rsync, single-file edits)
-- Never use Haiku
+- Haiku 4.5 → cheap, deterministic skills (path lookups, simple greps). Acceptable for skills with `<5` lines of logic; not for anything that needs judgement.
 
 ## <PROJECT_SPECIFIC_SECTION_1>  (delete if unused — e.g. "Thesis", "Deployment", "Dataset")
 - <KEY_DOC_PATH>

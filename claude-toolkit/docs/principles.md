@@ -35,7 +35,8 @@ You pay per token. The 4-file layout is designed around **what loads every turn 
 | Delegate large plans to **Plan** subagent | same isolation benefit |
 | Never re-`Read` a file just edited | Edit errors loudly on failure; re-reading is wasted |
 | Batch independent tool calls in one message | parallelism cuts latency and per-turn model overhead |
-| Bound `CLAUDE_CODE_MAX_OUTPUT_TOKENS` (default 8000) | hard ceiling on runaway replies |
+
+> **On `CLAUDE_CODE_MAX_OUTPUT_TOKENS`:** the toolkit no longer sets this. A static per-response cap truncates long edits and code reviews mid-stream, forcing re-work that costs *more* tokens than it saves. The agent already runs across as many responses as the task needs — let each response use the model's full budget. Only set the cap if you want to ceiling a chatty skill.
 
 ---
 
@@ -43,11 +44,17 @@ You pay per token. The 4-file layout is designed around **what loads every turn 
 
 | Model | When to use | Skill frontmatter |
 |---|---|---|
-| **Opus 4.7** | Intelligent multi-file reasoning — thesis rewrites, pipeline orchestration, architectural decisions, judgement calls | `model: opus` |
+| **Opus 4.7** | Intelligent multi-file reasoning — doc rewrites, pipeline orchestration, architectural decisions, council synthesis | `model: opus` |
 | **Sonnet (latest)** | Small/mechanical skills — claim verification, rsync, single-file edits, partition picking | `model: sonnet` |
-| **Haiku** | Never used — quality ceiling too low for serious work; saves pennies but costs re-work | — |
+| **Haiku 4.5** | Cheap deterministic glue — path lookups, presence-only greps, frontmatter parsing. Acceptable when the skill body is < 5 logical lines and there's no judgement call. | `model: haiku` |
 
-Opus pays for itself only when the task actually needs its reasoning depth. Sonnet handles 80%+ of skill invocations cleanly.
+Opus pays for itself only when the task actually needs its reasoning depth. Sonnet handles 80%+ of skill invocations cleanly. Haiku 4.5 (Jan 2026) closed enough of the quality gap that it's no longer auto-banned — just don't reach for it on anything that requires reasoning across files.
+
+## When to reach beyond this toolkit
+
+- **Multi-perspective decisions:** the bundled `council` skill convenes 4 Claude personas in parallel for high-stakes one-shot questions. For *cross-vendor* diversity (Codex + Gemini), the third-party [`agent-council`](https://github.com/yogirk/agent-council) is the relevant tool.
+- **Multi-reviewer PR sweep:** Claude Code's own `/ultrareview` runs a cloud-side multi-agent review on a branch or PR. Useful before a non-trivial merge.
+- **Cross-project memory search:** `grep -r 'pattern' ~/.claude/projects/*/memory/` is faster than any vector store at this scale; reach for embeddings only when you have a true external corpus.
 
 ---
 
@@ -59,6 +66,7 @@ Opus pays for itself only when the task actually needs its reasoning depth. Sonn
 - ❌ Do **not** ask Claude to "summarise the repo" as a warm-up — that is ~50K tokens for information already in CLAUDE.md.
 - ❌ Do **not** put project-specific facts in user-scope skills — generic skills read from `.claude/CLAUDE.md`, they don't bake in project paths.
 - ❌ Do **not** auto-submit jobs, auto-push commits, or auto-sync destructively — every irreversible action waits for user confirmation.
+- ❌ Do **not** convene the `council` skill on routine questions — it costs 4× the tokens of a normal turn. Reserve it for decisions where a wrong call is expensive.
 
 ---
 

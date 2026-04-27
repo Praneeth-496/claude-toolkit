@@ -1,4 +1,7 @@
 {
+  "_comment_tokens": "CLAUDE_CODE_MAX_OUTPUT_TOKENS is intentionally NOT set. The harness then uses the model's full per-response budget (Opus/Sonnet ≥ 32K, Haiku ≥ 8K). A static cap can truncate long edits/reviews mid-stream; the agent already runs across as many responses as the task needs, so a per-response cap is the wrong knob. Only set it if you actively want shorter replies (e.g. cost ceiling on a noisy skill).",
+  "_comment_git": "git commit and git push BOTH require explicit confirmation. They are NOT in the allow list — every invocation prompts the user.",
+
   "permissions": {
     "allow": [
       "WebSearch",
@@ -10,7 +13,6 @@
       "Bash(git diff*)",
       "Bash(git log*)",
       "Bash(git add*)",
-      "Bash(git commit*)",
       "Bash(git checkout*)",
       "Bash(git branch*)",
       "Bash(git stash*)",
@@ -43,15 +45,19 @@
       "Read(**/.env*)",
       "Read(**/.credentials*)",
       "Read(**/id_rsa*)",
+      "Read(**/*.pem)",
+      "Bash(git commit*)",
       "Bash(git push*)",
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)",
-      "Bash(rm -rf*)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(rm -r *)",
+      "Bash(rm --recursive*)",
+      "Bash(find * -delete*)",
       "Bash(sudo *)"
     ]
   },
-  "env": {
-    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "8000"
-  }
+  "env": {}
 }
