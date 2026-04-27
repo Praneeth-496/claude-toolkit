@@ -15,6 +15,8 @@ git clone <this-repo> ~/Documents/claude-toolkit
 # 2. Bootstrap a project
 cd /path/to/your/project
 bash ~/Documents/claude-toolkit/claude-toolkit/install.sh
+# Note: auto mode is enabled by default (requires Team/Enterprise/API plan).
+# Disable: remove "defaultMode":"auto" from .claude/settings.local.json
 
 # 3. Fill in the placeholders the installer flagged
 grep -nE '<[A-Z_]+>' .claude/CLAUDE.md .claude/CONTEXT.md
@@ -106,6 +108,7 @@ User-scope skills (`~/.claude/skills/`) are shared across every project. Project
 - **Memory is short and indexed.** `MEMORY.md` has one line per entry; bodies live in separate files. Truncation hits at line 200, so keep the index lean.
 - **No static output-token cap.** `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is intentionally unset — long edits and reviews use the model's full per-response budget. The agent already runs across as many responses as the task needs.
 - **Confirm before destructive actions.** `git commit`, `git push`, `git reset --hard`, recursive `rm`, and `sudo` are all in the deny list.
+- **Auto mode on by default (Sonnet + Opus).** `settings.local.json` sets `"defaultMode": "auto"` so every bootstrapped project runs autonomously without permission prompts for every tool call. Requires Claude Code v2.1.83+ and a Team/Enterprise/API plan. Disable by removing the key or pressing `Shift+Tab` mid-session.
 
 See [`claude-toolkit/docs/principles.md`](claude-toolkit/docs/principles.md) for the full list and [`claude-toolkit/docs/4-file-pattern.md`](claude-toolkit/docs/4-file-pattern.md) for the layout rationale.
 
