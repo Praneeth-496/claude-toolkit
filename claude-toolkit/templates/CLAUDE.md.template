@@ -52,6 +52,13 @@ Current status:
 - `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/` may go stale over time
 - Trust current code over memory; run the `refresh-memory` skill to re-derive
 
+## Skill auto-routing (proactive, no slash needed)
+- Before answering a non-trivial request, scan available skills (the system-reminder lists them) and pick the best match by `description` / TRIGGER phrases. Invoke it directly — do **not** wait for the user to type the `/name`.
+- Recall layer: if `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/graph/nodes.jsonl` exists, prefer `query-graph <keyword>` over reading `project_*.md` whole. It returns a 1-hop subgraph in ≤40 lines.
+- Durable facts: when the user states a relationship worth keeping ("X depends on Y", "we replaced Z with W", a decision), call `memory-graph add` instead of writing a new `project_*.md`.
+- Style/voice skills (`brief`, `godmode`, `10x`, `ghost`, `teacher`, `explainlikeim5`, `critique`, `devil`, `scout`, `compare`, `pitch`, `ooda`) auto-trigger on the phrasings in their descriptions — apply them for that turn, do not announce.
+- Rule of thumb: a skill exists, you noticed the trigger, you invoke. Asking the user to confirm the slash is wasted round-trips.
+
 ## Code style
 - <STYLE_NOTE_1>  (e.g. each pipeline step = one standalone Python file)
 - <STYLE_NOTE_2>  (e.g. config in dedicated files like config.py)

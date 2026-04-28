@@ -50,6 +50,18 @@ You pay per token. The 4-file layout is designed around **what loads every turn 
 
 Opus pays for itself only when the task actually needs its reasoning depth. Sonnet handles 80%+ of skill invocations cleanly. Haiku 4.5 (Jan 2026) closed enough of the quality gap that it's no longer auto-banned — just don't reach for it on anything that requires reasoning across files.
 
+## Skill auto-routing (don't wait for slash commands)
+
+Skills are not just `/command` shortcuts — they are first-class context the agent should consult on every non-trivial turn. The harness lists available skills at the top of each conversation; the matcher reads the `description:` frontmatter to decide relevance. **The agent's job is to scan that list, match the user's intent against the descriptions, and invoke proactively.** A user typing `/skillname` is the fallback path, not the primary one.
+
+Concrete rules:
+
+- **Recall before re-reading.** If a knowledge graph exists for the project (`memory/graph/nodes.jsonl`), reach for `query-graph <keyword>` before re-reading `project_*.md` snapshots. The 1-hop subgraph is typically 5–10× cheaper.
+- **Capture durable facts as graph edges, not new memory files.** When the user states a relationship ("X depends on Y", "we superseded Z"), invoke `memory-graph add` instead of writing a fresh `project_*.md`.
+- **Style/voice skills (`brief`, `godmode`, `10x`, `ghost`, `teacher`, `critique`, `devil`, `scout`, `compare`, `pitch`, `ooda`, `explainlikeim5`) match on natural-language phrases**, not just `/name`. The triggers are listed in each skill's `description:` — apply them silently, do not announce.
+- **Never ask "should I use skill X?".** If the description matches the request, invoke. If it doesn't, don't. The middle path of asking permission turns every skill into a slash command and defeats the auto-routing point.
+- **Description fields are the contract.** When writing a new skill, front-load the `description:` with the natural-language phrases that should trigger it ("TRIGGER when user says ..."). The matcher only reads that field.
+
 ## When to reach beyond this toolkit
 
 - **Multi-perspective decisions:** the bundled `council` skill convenes 4 Claude personas in parallel for high-stakes one-shot questions. For *cross-vendor* diversity (Codex + Gemini), the third-party [`agent-council`](https://github.com/yogirk/agent-council) is the relevant tool.

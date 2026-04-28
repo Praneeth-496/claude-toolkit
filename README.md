@@ -59,7 +59,9 @@ claude-toolkit/
 │   │   ├── refresh-memory/           re-derive project memory from current code state
 │   │   ├── sync-rsync/               dry-run-first rsync to any remote
 │   │   ├── submit-slurm/             pick freest SLURM partition; never auto-submits
-│   │   └── run-pipeline/             chained script orchestrator with --dependency=afterok
+│   │   ├── run-pipeline/             chained script orchestrator with --dependency=afterok
+│   │   ├── memory-graph/             build/extend a JSONL knowledge graph (Graphiti-style) under memory/
+│   │   └── query-graph/              cheap grep+jq lookup of the graph; returns 1-hop subgraph
 │   ├── skills-examples/              reference implementations; copy + adapt
 │   │   └── edit-doc-strict/          style-guard + numeric-verification editing pattern
 │   └── docs/
@@ -94,6 +96,8 @@ User-scope skills (`~/.claude/skills/`) are shared across every project. Project
 | `sync-rsync` | sonnet | Dry-run-first rsync to a remote (HPC / dev server). Excludes `settings.local.json` and large binaries. |
 | `submit-slurm` | sonnet | Reads `sinfo`/`squeue`, picks the freest matching partition, prints the `sbatch` command. Never submits. |
 | `run-pipeline` | opus | Chains shell scripts as `sbatch --dependency=afterok` jobs (or sequential bash locally). Awaits user approval. |
+| `memory-graph` | opus | Builds / extends a Graphiti-style knowledge graph (`graph/nodes.jsonl` + `edges.jsonl`) under the project's memory dir. Modes: `build`, `add`, `rebuild`. Auto-triggers on phrases like "X depends on Y", "we superseded Z with W", or "remember the decision about …". |
+| `query-graph` | haiku | Cheap keyword + `jq` lookup over the graph; returns a 1-hop subgraph as compact markdown. Token-light recall layer — auto-preferred over re-reading flat `project_*.md` snapshots whenever a graph exists. |
 
 `skills-examples/edit-doc-strict/` is a reference pattern — not auto-installed. Copy and adapt it when a single document (thesis, spec, RFC, release notes) needs hard style/correctness rules.
 
@@ -106,6 +110,8 @@ User-scope skills (`~/.claude/skills/`) are shared across every project. Project
 - **Model routing.** Opus for judgement and council synthesis, Sonnet for mechanical work, Haiku 4.5 for trivial deterministic glue. Set `model:` in each `SKILL.md` frontmatter.
 - **Verification before insertion.** Numbers going into docs/memory must trace to a source file — `verify-result-claim` is the gate.
 - **Memory is short and indexed.** `MEMORY.md` has one line per entry; bodies live in separate files. Truncation hits at line 200, so keep the index lean.
+- **Graph memory for larger projects.** Past a few thousand lines, prefer `memory-graph` + `query-graph` over flat snapshots. Edges (`depends_on`, `imports`, `supersedes`, `decided_by`) make recall ≥10× cheaper than re-reading `project_*.md` files, and `supersedes` makes stale facts auto-flag instead of silently overwrite.
+- **Skills auto-route, no slash needed.** The agent reads each skill's `description:` / TRIGGER phrases and invokes proactively when the user's intent matches — `/memory-graph add` is a fallback, not the primary path. See [`skill auto-routing`](claude-toolkit/docs/principles.md#skill-auto-routing-dont-wait-for-slash-commands).
 - **No static output-token cap.** `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is intentionally unset — long edits and reviews use the model's full per-response budget. The agent already runs across as many responses as the task needs.
 - **Confirm before destructive actions.** `git commit`, `git push`, `git reset --hard`, recursive `rm`, and `sudo` are all in the deny list.
 - **Auto mode on by default (Sonnet + Opus).** `settings.local.json` sets `"defaultMode": "auto"` so every bootstrapped project runs autonomously without permission prompts for every tool call. Requires Claude Code v2.1.83+ and a Team/Enterprise/API plan. Disable by removing the key or pressing `Shift+Tab` mid-session.
@@ -141,6 +147,16 @@ The bundled `council` skill is **Claude-only** (4 personas, varied prompts and m
 If you genuinely need *cross-vendor* model diversity (e.g. you're choosing between AI providers themselves), the third-party [`agent-council`](https://github.com/yogirk/agent-council) shells out to Codex CLI and Gemini CLI. It needs those CLIs installed and authenticated, takes longer, and overlaps with Claude Code's first-party `/ultrareview` for PR-style reviews.
 
 Rule of thumb: bundled `council` for design questions, `/ultrareview` for branch reviews, external `agent-council` only when the decision is specifically about non-Claude models.
+
+---
+
+## What changed in 0.3.0
+
+- **New skill: `memory-graph`** — builds and extends a Graphiti-style JSONL knowledge graph (`graph/nodes.jsonl` + `graph/edges.jsonl`) inside the per-project memory directory. Captures files, modules, concepts, decisions, and people, plus typed relationships (`imports`, `depends_on`, `supersedes`, `decided_by`, `references`). Project-agnostic — works on any git repo.
+- **New skill: `query-graph`** — cheap `grep` + `jq` lookup that returns matching nodes plus their 1-hop edges as a ≤40-line markdown subgraph. Replaces re-reading flat `project_*.md` snapshots for entity-scoped recall questions.
+- **Skill auto-routing documented.** New section in `docs/principles.md` and the `CLAUDE.md.template` instruct the agent to scan available skills' `description:` / TRIGGER phrases on every non-trivial turn and invoke proactively, instead of waiting for the user to type `/skillname`.
+- **`auto-memory`** cross-links to `memory-graph` so larger projects get the relationship graph after the flat snapshot.
+- **No `install.sh` change required.** The install loop already iterates every directory in `skills-generic/`; the two new skill folders are picked up automatically.
 
 ---
 

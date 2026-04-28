@@ -8,6 +8,7 @@ model: opus
 - First time a project is opened with this toolkit installed and `~/.claude/projects/<encoded>/memory/` is empty or missing.
 - User says "build memory", "init memory", "auto memory", "scan the project for memory".
 - After major refactors when the existing memory clearly disagrees with the code (a `refresh-memory` is finer-grained; this is the from-scratch rebuild).
+- For larger projects (≥30 source files), follow up with `memory-graph build` to seed the relationship graph — `auto-memory` writes flat snapshots; `memory-graph` adds queryable structure on top.
 
 This skill never invents facts about the *user* or *feedback* — those memory types come from real conversations. It only writes `project` and `reference` memories that can be derived from the repo itself.
 
