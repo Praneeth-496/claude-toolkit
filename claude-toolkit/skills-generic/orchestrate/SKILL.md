@@ -19,6 +19,8 @@ These are checked-in subagents at `.claude/agents/` (project) or `~/.claude/agen
 | `simplifier` | Diff added a new helper/abstraction; before declaring "done" on a refactor |
 | `doc-writer` | Public API changed; README example may be stale; CHANGELOG due |
 | `adversary` | Decision is irreversible (migration, schema change, dependency replacement) |
+| `fact-checker` | **Verification step.** Verifies individual factual claims (paths, symbols, line numbers, numbers, API signatures, citations) against the repo. Returns VERIFIED / UNVERIFIED / FALSE per claim. |
+| `flow-auditor` | **Synthesis-integrity step.** Verifies the *reasoning chain* between claims: does each conclusion follow from the cited evidence? Catches OVERREACH, UNSUPPORTED leaps, and CONTRADICTED steps that fact-checker won't see. |
 
 ## Process
 
@@ -37,6 +39,8 @@ PLAN:
   1. [parallel] code-reviewer + security-auditor + test-runner
   2. [serial after 1] simplifier (only if 1 found nothing blocking)
   3. [serial after 2] doc-writer
+  4. [serial after all] fact-checker — verify factual claims in the synthesis below
+  5. [serial after 4] flow-auditor — verify the synthesis's reasoning chain holds
 
 RESULTS (consolidated):
   Blockers (must-fix):
@@ -52,6 +56,8 @@ NEXT: <one concrete action for the user>
 ## Hard rules
 
 - **Never call yourself.** No recursive `orchestrate`.
-- **Cap at 6 specialists per run.** If you need more, the goal is too big — split.
+- **Cap at 6 specialists per run, plus the verification pair (fact-checker + flow-auditor).** The verification pair doesn't count toward the cap; they are the integrity layer, not specialists. If you need more specialists, the goal is too big — split.
+- **Run the verification pair on the synthesis before showing it to the user** for any orchestrate flow that produced ≥3 specialist outputs. Run `fact-checker` first (catches false claims); then `flow-auditor` (catches unsupported leaps that fact-checker can't see). Persist the run as `.claude/orchestrate/last-run.md` so both can re-read the synthesis and the constituent agent outputs.
+- **Surface the verdicts.** If `fact-checker` returns `reject` or `flow-auditor` returns `discard-chain`, mark the orchestrate result as `BLOCKED` in your output. Don't pretend it's clean.
 - **Don't paraphrase agent reports as "the agent said X".** Either include their finding directly (verbatim file:line + claim) or drop it.
 - **If two agents disagree** (e.g. simplifier says "remove this", code-reviewer says "keep for clarity"), surface the conflict to the user. Don't pick.

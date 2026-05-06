@@ -56,7 +56,9 @@ claude-toolkit/
 │   │   ├── test-runner.md            detects + runs project's test command (sonnet)
 │   │   ├── simplifier.md             flags dead code, single-use abstractions (sonnet, read-only)
 │   │   ├── adversary.md              steelman the opposite of the proposed change (opus)
-│   │   └── doc-writer.md             updates docs to match a code change (sonnet, docs-only)
+│   │   ├── doc-writer.md             updates docs to match a code change (sonnet, docs-only)
+│   │   ├── fact-checker.md           verifies individual claims (paths, symbols, numbers, signatures) against the repo (sonnet, read-only)
+│   │   └── flow-auditor.md           verifies the *reasoning chain* between claims (catches unsupported leaps) (opus, read-only)
 │   ├── templates/
 │   │   ├── CLAUDE.md.template        always-loaded project onboarding (≤150 lines target)
 │   │   ├── CONTEXT.md.template       lazy-loaded heavier background
@@ -168,6 +170,8 @@ Six specialist subagents are checked into every project on install. Use them via
 | `simplifier` | sonnet | read-only | Flags dead code, single-use helpers, premature generalisation |
 | `adversary` | opus | read-only | Steelmans the opposite of the proposed change |
 | `doc-writer` | sonnet | edit (docs only) | Updates docstrings, README, CHANGELOG to match a code change |
+| `fact-checker` | sonnet | read-only | Verifies individual factual claims (paths, symbols, line numbers, numbers, API signatures, commit hashes, citations) against the repo. Returns VERIFIED / UNVERIFIED / FALSE per claim. Verdict: ship / revise / reject. |
+| `flow-auditor` | opus | read-only | Verifies the *reasoning chain* between claims: does each conclusion follow from the evidence cited? Catches OVERREACH, UNSUPPORTED leaps, and CONTRADICTED steps. Returns: accept / re-run-failing-steps / discard-chain. |
 
 The `orchestrate` skill knows about these and dispatches them as a team. The `pr-prep` skill chains `test-runner` + `security-auditor`. Use them individually for narrow tasks, or via `orchestrate` for cross-cutting reviews.
 
@@ -231,6 +235,18 @@ The bundled `council` skill is **Claude-only** (4 personas, varied prompts and m
 If you genuinely need *cross-vendor* model diversity (e.g. you're choosing between AI providers themselves), the third-party [`agent-council`](https://github.com/yogirk/agent-council) shells out to Codex CLI and Gemini CLI. It needs those CLIs installed and authenticated, takes longer, and overlaps with Claude Code's first-party `/ultrareview` for PR-style reviews.
 
 Rule of thumb: bundled `council` for design questions, `/ultrareview` for branch reviews, external `agent-council` only when the decision is specifically about non-Claude models.
+
+---
+
+## What changed in 0.4.1
+
+Two new agents that close the integrity gap. Together they make orchestrate runs trustworthy at scale.
+
+- **New agent: `fact-checker`** (sonnet, read-only). Verifies every concrete factual claim in another agent's output: file paths, function/symbol names, line citations, numeric results, API signatures, library presence, commit hashes, citations. Three buckets per claim — VERIFIED / UNVERIFIED / FALSE — with verbatim quotes and exact evidence (`grep`, `git show`, `jq` over JSON). Verdict: ship / revise / reject. A single FALSE on a load-bearing claim is enough to reject.
+- **New agent: `flow-auditor`** (opus, read-only). Audits the *reasoning chain* — what `fact-checker` doesn't see. Numbers each step in a chain, identifies the load-bearing path, classifies dependencies as GROUNDED / OVERREACH / UNSUPPORTED / CONTRADICTED. Catches the case where every individual claim is true but the conclusion doesn't follow. Verdict: accept / re-run-failing-steps / discard-chain.
+- **`orchestrate` skill updated** to make `fact-checker` + `flow-auditor` the verification pair after any flow with ≥3 specialist outputs. Persists to `.claude/orchestrate/last-run.md` so both checkers can re-read it. If either returns a reject verdict, the orchestrate result is marked BLOCKED.
+- **Plugin manifest version bumped** to 0.4.1 in `.claude-plugin/plugin.json`.
+- Complements `verify-result-claim` (the gate for numeric claims going into docs). `fact-checker` is the broader gate; `flow-auditor` is the cross-cutting one.
 
 ---
 
