@@ -17,7 +17,7 @@ for arg in "$@"; do
     --update) MODE="update" ;;
     --force)  MODE="force"  ;;
     -h|--help)
-      sed -n '2,10p' "$0"; exit 0 ;;
+      sed -n '2,12p' "$0"; exit 0 ;;
     *) echo "unknown flag: $arg" >&2; exit 2 ;;
   esac
 done
@@ -38,21 +38,67 @@ copy_file() {
     return
   fi
   cp "$src" "$dst"
-  echo "  $([[ -e "$dst.bak" ]] && echo update || echo copy): $dst"
+  echo "  copy: $dst"
+}
+
+copy_dir() {
+  # copy_dir SRC_DIR DST_DIR [overwrite]
+  local src="$1" dst="$2" overwrite="${3:-no}"
+  if [[ -e "$dst" && "$overwrite" != "yes" ]]; then
+    echo "  skip: $dst already exists"
+    return
+  fi
+  mkdir -p "$(dirname "$dst")"
+  cp -r "$src" "$dst"
+  echo "  copy: $dst"
 }
 
 # ── 1. Project-scope .claude/ files ─────────────────────────────────────────
-mkdir -p "$TARGET/.claude"
+mkdir -p "$TARGET/.claude" "$TARGET/.claude/hooks" "$TARGET/.claude/agents"
 
-echo "[1/5] Project .claude/ templates"
+echo "[1/7] Project .claude/ templates"
 TEMPLATE_OVERWRITE=no
 [[ "$MODE" == "force" ]] && TEMPLATE_OVERWRITE=yes
-copy_file "$TOOLKIT/templates/CLAUDE.md.template"          "$TARGET/.claude/CLAUDE.md"          "$TEMPLATE_OVERWRITE"
-copy_file "$TOOLKIT/templates/CONTEXT.md.template"         "$TARGET/.claude/CONTEXT.md"         "$TEMPLATE_OVERWRITE"
+copy_file "$TOOLKIT/templates/CLAUDE.md.template"           "$TARGET/.claude/CLAUDE.md"           "$TEMPLATE_OVERWRITE"
+copy_file "$TOOLKIT/templates/CONTEXT.md.template"          "$TARGET/.claude/CONTEXT.md"          "$TEMPLATE_OVERWRITE"
 copy_file "$TOOLKIT/templates/settings.local.json.template" "$TARGET/.claude/settings.local.json" "$TEMPLATE_OVERWRITE"
+copy_file "$TOOLKIT/templates/statusline.sh"                "$TARGET/.claude/statusline.sh"       "$TEMPLATE_OVERWRITE"
+chmod +x "$TARGET/.claude/statusline.sh" 2>/dev/null || true
 
-# ── 2. .gitignore snippet ───────────────────────────────────────────────────
-echo "[2/5] .gitignore"
+# ── 2. Hooks (project-scope) ───────────────────────────────────────────────
+echo "[2/7] Project hooks (.claude/hooks/)"
+HOOK_OVERWRITE=no
+[[ "$MODE" == "force" || "$MODE" == "update" ]] && HOOK_OVERWRITE=yes
+for hook_src in "$TOOLKIT/templates/hooks"/*.sh; do
+  [[ -f "$hook_src" ]] || continue
+  hook_name="$(basename "$hook_src")"
+  hook_dst="$TARGET/.claude/hooks/$hook_name"
+  if [[ -e "$hook_dst" && "$HOOK_OVERWRITE" != "yes" ]]; then
+    echo "  skip: $hook_dst already exists"
+  else
+    cp "$hook_src" "$hook_dst"
+    chmod +x "$hook_dst"
+    echo "  copy: $hook_dst"
+  fi
+done
+copy_file "$TOOLKIT/templates/hooks/README.md" "$TARGET/.claude/hooks/README.md" "$HOOK_OVERWRITE"
+
+# ── 3. Agents (project-scope, lazy: copy if not present) ───────────────────
+echo "[3/7] Project agents (.claude/agents/)"
+for agent_src in "$TOOLKIT/agents"/*.md; do
+  [[ -f "$agent_src" ]] || continue
+  agent_name="$(basename "$agent_src")"
+  agent_dst="$TARGET/.claude/agents/$agent_name"
+  if [[ -e "$agent_dst" && "$MODE" == "install" ]]; then
+    echo "  skip: $agent_dst already exists (use --update to overwrite)"
+    continue
+  fi
+  cp "$agent_src" "$agent_dst"
+  echo "  copy: $agent_dst"
+done
+
+# ── 4. .gitignore snippet ──────────────────────────────────────────────────
+echo "[4/7] .gitignore"
 SNIPPET_MARKER="# claude-toolkit managed"
 if [[ -f "$TARGET/.gitignore" ]] && grep -qF "$SNIPPET_MARKER" "$TARGET/.gitignore"; then
   echo "  skip: snippet already present in .gitignore"
@@ -65,8 +111,8 @@ else
   echo "  append: added snippet to $TARGET/.gitignore"
 fi
 
-# ── 3. User-scope generic skills ────────────────────────────────────────────
-echo "[3/5] User skills (~/.claude/skills/)"
+# ── 5. User-scope generic skills ────────────────────────────────────────────
+echo "[5/7] User skills (~/.claude/skills/)"
 mkdir -p "$HOME/.claude/skills"
 for skill_dir in "$TOOLKIT/skills-generic"/*/; do
   name=$(basename "$skill_dir")
@@ -85,8 +131,8 @@ for skill_dir in "$TOOLKIT/skills-generic"/*/; do
   fi
 done
 
-# ── 4. Version stamp ───────────────────────────────────────────────────────
-echo "[4/5] Version stamp"
+# ── 6. Version stamp ───────────────────────────────────────────────────────
+echo "[6/7] Version stamp"
 VERSION_FILE="$TOOLKIT/VERSION"
 if [[ -f "$VERSION_FILE" ]]; then
   cp "$VERSION_FILE" "$HOME/.claude/skills/.claude-toolkit-version"
@@ -95,8 +141,8 @@ else
   echo "  skip: no VERSION file in toolkit"
 fi
 
-# ── 5. Reminder to fill placeholders ────────────────────────────────────────
-echo "[5/5] Next steps"
+# ── 7. Reminder to fill placeholders ────────────────────────────────────────
+echo "[7/7] Next steps"
 echo
 PLACEHOLDER_RE='<[A-Z_][A-Z_]*>'
 MISSING=0
@@ -111,5 +157,10 @@ if [[ "$MISSING" -gt 0 ]]; then
 else
   echo "  all placeholders already resolved."
 fi
+echo
+echo "  Optional next steps:"
+echo "    - copy templates/devcontainer/ to .devcontainer/ for a sandboxed workflow"
+echo "    - copy templates/github-workflows/claude-pr-review.yml to .github/workflows/"
+echo "    - install ccusage (npm i -g ccusage) for cost data in the statusline"
 echo
 echo "Done."

@@ -1,0 +1,37 @@
+name: Claude PR review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  review:
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code review
+        uses: anthropics/claude-code-action@v1
+        with:
+          prompt: |
+            Review this PR like the toolkit's `code-reviewer` agent would:
+              1. Read git diff for the PR.
+              2. Group findings as Blocker / Should-fix / Nit.
+              3. Post one PR-level comment with the grouped findings.
+              4. Ignore style/formatting (the format-on-write hook covers that).
+              5. Be terse. No fluff. No emojis.
+          claude_args: --max-turns 8
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

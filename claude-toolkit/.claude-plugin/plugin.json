@@ -1,0 +1,12 @@
+{
+  "name": "claude-toolkit",
+  "description": "Portable Claude Code context, skills, hooks, and guard rails. File-based memory, council orchestration, numeric-claim verification, HPC/SLURM helpers, and devcontainer-ready security.",
+  "version": "0.4.0",
+  "author": {
+    "name": "Praneeth Dathu",
+    "url": "https://github.com/Praneeth-496"
+  },
+  "homepage": "https://github.com/Praneeth-496/claude-toolkit",
+  "repository": "https://github.com/Praneeth-496/claude-toolkit",
+  "license": "MIT-0"
+}

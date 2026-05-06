@@ -1,0 +1,37 @@
+{
+  "name": "claude-toolkit-sandbox",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+  },
+
+  "mounts": [
+    "source=claude-toolkit-cache,target=/home/vscode/.claude,type=volume"
+  ],
+
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "github.vscode-github-actions"
+      ]
+    }
+  },
+
+  "_comment_security": "Host Docker socket is INTENTIONALLY NOT mounted — agent escape via the daemon would defeat the sandbox. Network egress is allowed (npm, pip, gh) but the agent has no host-filesystem access beyond the cloned project. To run with bypass mode (--dangerously-skip-permissions) safely, do it ONLY inside this container.",
+  "_comment_dotfiles": "We deliberately do NOT mount your host ~/.ssh, ~/.aws, or ~/.config. If you need a tool inside the container that requires credentials, set them via containerEnv from a Codespaces secret or a docker-compose .env file. Never bake secrets into the image."
+}

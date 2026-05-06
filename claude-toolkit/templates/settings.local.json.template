@@ -2,6 +2,10 @@
   "_comment_tokens": "CLAUDE_CODE_MAX_OUTPUT_TOKENS is intentionally NOT set. The harness then uses the model's full per-response budget (Opus/Sonnet ≥ 32K, Haiku ≥ 8K). A static cap can truncate long edits/reviews mid-stream; the agent already runs across as many responses as the task needs, so a per-response cap is the wrong knob. Only set it if you actively want shorter replies (e.g. cost ceiling on a noisy skill).",
   "_comment_git": "git commit and git push BOTH require explicit confirmation. They are NOT in the allow list — every invocation prompts the user.",
   "_comment_automode": "defaultMode: auto enables autonomous execution for Sonnet AND Opus (Claude Code v2.1.83+). Requires Team/Enterprise/API plan — remove this key if you are on a Pro plan or want per-action prompts. Toggle mid-session with Shift+Tab.",
+  "_comment_hooks": "Hooks are deterministic guardrails. Documented at https://code.claude.com/docs/en/hooks (29 events). Scripts ship in .claude/hooks/. Delete a block to disable that hook; the script can stay on disk.",
+  "_comment_agentteams": "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS to '1' to enable agent teams (requires Claude Code v2.1.32+). Off by default; agent teams use significantly more tokens.",
+  "_comment_statusline": "statusLine is enabled by default and points at the toolkit-shipped statusline.sh. Delete the statusLine block to use the default. Requires ccusage installed via npm/brew for cost data, but works without it.",
+
   "defaultMode": "auto",
 
   "permissions": {
@@ -10,6 +14,8 @@
       "WebFetch(domain:arxiv.org)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:code.claude.com)",
       "WebFetch(domain:stackoverflow.com)",
       "Bash(git status)",
       "Bash(git diff*)",
@@ -18,6 +24,7 @@
       "Bash(git checkout*)",
       "Bash(git branch*)",
       "Bash(git stash*)",
+      "Bash(git worktree*)",
       "Bash(python *)",
       "Bash(python3 *)",
       "Bash(pip install*)",
@@ -61,5 +68,66 @@
       "Bash(sudo *)"
     ]
   },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-dangerous-bash.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/format-on-write.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-briefing.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-compact-briefing.sh"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-compact-restore.sh"
+          }
+        ]
+      }
+    ]
+  },
+
+  "statusLine": {
+    "type": "command",
+    "command": "$CLAUDE_PROJECT_DIR/.claude/statusline.sh"
+  },
+
   "env": {}
 }

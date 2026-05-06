@@ -47,14 +47,38 @@ claude-toolkit/
 ├── claude-toolkit/
 │   ├── VERSION                       toolkit version (stamped into ~/.claude/skills/.claude-toolkit-version on install)
 │   ├── install.sh                    bootstrap script (idempotent; --update / --force)
+│   ├── .claude-plugin/
+│   │   ├── plugin.json               Claude Code plugin manifest (for /plugin install)
+│   │   └── marketplace.json          marketplace entry pointing back at this repo
+│   ├── agents/                       project-scope subagents installed to .claude/agents/
+│   │   ├── code-reviewer.md          strict diff review (sonnet, read-only)
+│   │   ├── security-auditor.md       OWASP-style security pass on diff (sonnet, read-only)
+│   │   ├── test-runner.md            detects + runs project's test command (sonnet)
+│   │   ├── simplifier.md             flags dead code, single-use abstractions (sonnet, read-only)
+│   │   ├── adversary.md              steelman the opposite of the proposed change (opus)
+│   │   └── doc-writer.md             updates docs to match a code change (sonnet, docs-only)
 │   ├── templates/
 │   │   ├── CLAUDE.md.template        always-loaded project onboarding (≤150 lines target)
 │   │   ├── CONTEXT.md.template       lazy-loaded heavier background
-│   │   ├── settings.local.json.template   permissions + deny list (no static token cap)
-│   │   └── gitignore-snippet.txt     lines appended to a project .gitignore
+│   │   ├── settings.local.json.template   permissions + deny list + hooks + statusline
+│   │   ├── statusline.sh             toolkit statusline: branch | dirty | model | cost (ccusage)
+│   │   ├── gitignore-snippet.txt     lines appended to a project .gitignore
+│   │   ├── hooks/                    deterministic guardrails (29 events at code.claude.com/docs/en/hooks)
+│   │   │   ├── block-dangerous-bash.sh    PreToolUse(Bash): block force-push, rm -rf /, fork bombs, etc.
+│   │   │   ├── format-on-write.sh         PostToolUse(Edit|Write): run ruff/prettier/rustfmt etc.
+│   │   │   ├── session-briefing.sh        SessionStart: inject git briefing
+│   │   │   ├── pre-compact-briefing.sh    PreCompact: snapshot session state
+│   │   │   └── post-compact-restore.sh    PostCompact: re-inject snapshot
+│   │   ├── devcontainer/             sandboxed VS Code devcontainer for bypass-mode work
+│   │   │   ├── devcontainer.json     Ubuntu 24.04 + Claude Code, no Docker socket / SSH mounts
+│   │   │   └── post-create.sh        installs ruff/prettier/shfmt/ccusage
+│   │   └── github-workflows/         drop into .github/workflows/
+│   │       └── claude-pr-review.yml  anthropics/claude-code-action@v1 on PRs + @claude mentions
 │   ├── skills-generic/               drop into ~/.claude/skills/ — project-agnostic
 │   │   ├── auto-memory/              scan a fresh repo and seed project memory automatically
 │   │   ├── council/                  convene 4 Claude personas on a high-stakes decision
+│   │   ├── orchestrate/              operator pattern: decompose → dispatch specialists → synthesize
+│   │   ├── pr-prep/                  stage + test + security + draft PR title/body (stops before push)
 │   │   ├── verify-result-claim/      grep-based numeric-claim verifier
 │   │   ├── refresh-memory/           re-derive project memory from current code state
 │   │   ├── sync-rsync/               dry-run-first rsync to any remote
@@ -76,12 +100,41 @@ claude-toolkit/
 1. Copies `templates/CLAUDE.md.template` → `./.claude/CLAUDE.md` *(skip if exists, unless `--force`)*
 2. Copies `templates/CONTEXT.md.template` → `./.claude/CONTEXT.md`
 3. Copies `templates/settings.local.json.template` → `./.claude/settings.local.json`
-4. Appends `templates/gitignore-snippet.txt` to `./.gitignore` (skipped if already present, marker-detected)
-5. Copies `skills-generic/*` → `~/.claude/skills/` (user scope; `--update` overwrites)
-6. Stamps the toolkit version into `~/.claude/skills/.claude-toolkit-version`
-7. Counts unfilled `<PLACEHOLDER>` markers in your new `CLAUDE.md` / `CONTEXT.md` and prints the grep command to find them
+4. Copies `templates/statusline.sh` → `./.claude/statusline.sh` (chmod +x)
+5. Copies `templates/hooks/*.sh` → `./.claude/hooks/` (chmod +x; `--update` overwrites)
+6. Copies `agents/*.md` → `./.claude/agents/` (project-scope subagents)
+7. Appends `templates/gitignore-snippet.txt` to `./.gitignore` (skipped if already present)
+8. Copies `skills-generic/*` → `~/.claude/skills/` (user scope; `--update` overwrites)
+9. Stamps the toolkit version into `~/.claude/skills/.claude-toolkit-version`
+10. Counts unfilled `<PLACEHOLDER>` markers and prints next-step hints
 
-User-scope skills (`~/.claude/skills/`) are shared across every project. Project-specific skills can sit under `./.claude/skills/` — copy them manually from `skills-examples/`.
+User-scope skills (`~/.claude/skills/`) are shared across every project. Project-scope agents and hooks live under `./.claude/` and travel with the repo.
+
+### Optional add-ons (manual copy)
+
+```bash
+# Sandboxed devcontainer (recommended for bypass-mode / autonomous runs)
+cp -r ~/Documents/claude-toolkit/claude-toolkit/templates/devcontainer .devcontainer
+
+# GitHub Actions PR review
+mkdir -p .github/workflows
+cp ~/Documents/claude-toolkit/claude-toolkit/templates/github-workflows/claude-pr-review.yml .github/workflows/
+gh secret set ANTHROPIC_API_KEY
+
+# Cost data in the statusline
+npm install -g ccusage
+```
+
+### Plugin install (alternative to install.sh)
+
+The toolkit ships a `.claude-plugin/plugin.json` manifest, so it can also be installed via Claude Code's native plugin system:
+
+```
+/plugin marketplace add github:Praneeth-496/claude-toolkit
+/plugin install claude-toolkit
+```
+
+Plugin install gives namespaced skills (`/claude-toolkit:auto-memory`) and version-pinned updates; `install.sh` gives unprefixed skills and direct file ownership. Pick one — running both will fight for the same skill names.
 
 ---
 
@@ -98,8 +151,39 @@ User-scope skills (`~/.claude/skills/`) are shared across every project. Project
 | `run-pipeline` | opus | Chains shell scripts as `sbatch --dependency=afterok` jobs (or sequential bash locally). Awaits user approval. |
 | `memory-graph` | opus | Builds / extends a Graphiti-style knowledge graph (`graph/nodes.jsonl` + `edges.jsonl`) under the project's memory dir. Modes: `build`, `add`, `rebuild`. Auto-triggers on phrases like "X depends on Y", "we superseded Z with W", or "remember the decision about …". |
 | `query-graph` | haiku | Cheap keyword + `jq` lookup over the graph; returns a 1-hop subgraph as compact markdown. Token-light recall layer — auto-preferred over re-reading flat `project_*.md` snapshots whenever a graph exists. |
+| `orchestrate` | opus | Operator/orchestrator pattern. Decomposes a task, dispatches specialists (`code-reviewer`, `security-auditor`, `test-runner`, `simplifier`, `doc-writer`, `adversary`) in parallel/sequence, synthesizes one consolidated result. |
+| `pr-prep` | sonnet | End-to-end PR prep: snapshot diff, run tests via `test-runner`, security pass via `security-auditor`, match the project's house style by reading recent merged PRs, draft title + body. **Stops before push.** |
 
 `skills-examples/edit-doc-strict/` is a reference pattern — not auto-installed. Copy and adapt it when a single document (thesis, spec, RFC, release notes) needs hard style/correctness rules.
+
+## Project-scope agents (installed to `.claude/agents/`)
+
+Six specialist subagents are checked into every project on install. Use them via `Task` tool (Claude routes by description) or invoke explicitly: "use the code-reviewer agent on this diff".
+
+| Agent | Model | Tools | Purpose |
+|---|---|---|---|
+| `code-reviewer` | sonnet | read-only | Diff review with severity grouping (Blocker / Should-fix / Nit) |
+| `security-auditor` | sonnet | read-only | OWASP-style audit on changed lines |
+| `test-runner` | sonnet | bash + read | Detects test command (Make/npm/pytest/cargo/go), runs, summarizes failures |
+| `simplifier` | sonnet | read-only | Flags dead code, single-use helpers, premature generalisation |
+| `adversary` | opus | read-only | Steelmans the opposite of the proposed change |
+| `doc-writer` | sonnet | edit (docs only) | Updates docstrings, README, CHANGELOG to match a code change |
+
+The `orchestrate` skill knows about these and dispatches them as a team. The `pr-prep` skill chains `test-runner` + `security-auditor`. Use them individually for narrow tasks, or via `orchestrate` for cross-cutting reviews.
+
+## Hooks (installed to `.claude/hooks/`)
+
+Five hooks ship enabled by default — deterministic guardrails that beat permission prompts. Disable any by deleting its block in `settings.local.json`; the script can stay on disk.
+
+| Hook | Event | What it does |
+|---|---|---|
+| `block-dangerous-bash.sh` | `PreToolUse(Bash)` | Hard-blocks `git push --force`, `rm -rf /`, `chmod 777`, fork bombs, `dd of=/dev/sd*`, `curl … \| sh` patterns |
+| `format-on-write.sh` | `PostToolUse(Edit\|Write)` | Best-effort formatter run (ruff/black/prettier/rustfmt/gofmt/shfmt) on modified files |
+| `session-briefing.sh` | `SessionStart` | Injects branch + dirty-file count + last 5 commits as session context |
+| `pre-compact-briefing.sh` | `PreCompact` | Snapshots state to `.claude/_compact_briefing.md` before auto-compact |
+| `post-compact-restore.sh` | `PostCompact` | Re-injects the snapshot into the new (compacted) context window |
+
+Full list of available hook events (29 total): https://code.claude.com/docs/en/hooks
 
 ---
 
@@ -147,6 +231,22 @@ The bundled `council` skill is **Claude-only** (4 personas, varied prompts and m
 If you genuinely need *cross-vendor* model diversity (e.g. you're choosing between AI providers themselves), the third-party [`agent-council`](https://github.com/yogirk/agent-council) shells out to Codex CLI and Gemini CLI. It needs those CLIs installed and authenticated, takes longer, and overlaps with Claude Code's first-party `/ultrareview` for PR-style reviews.
 
 Rule of thumb: bundled `council` for design questions, `/ultrareview` for branch reviews, external `agent-council` only when the decision is specifically about non-Claude models.
+
+---
+
+## What changed in 0.4.0
+
+Verified against the official Claude Code docs ([hooks](https://code.claude.com/docs/en/hooks), [plugins](https://code.claude.com/docs/en/plugins), [sub-agents](https://code.claude.com/docs/en/sub-agents), [agent-teams](https://code.claude.com/docs/en/agent-teams)) before shipping.
+
+- **Hooks layer.** Five hook scripts under `templates/hooks/` wired into the `settings.local.json` template: `PreToolUse(Bash)` blocks dangerous commands; `PostToolUse(Edit|Write)` runs the project's formatter; `SessionStart` injects a git briefing; `PreCompact` / `PostCompact` make session state survive auto-compaction.
+- **Plugin manifest.** `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`. The toolkit now installs via `/plugin install claude-toolkit` in addition to `install.sh`.
+- **Six project-scope agents.** `agents/{code-reviewer,security-auditor,test-runner,simplifier,adversary,doc-writer}.md`. Installed to `.claude/agents/` and dispatched by the new `orchestrate` skill.
+- **New skill: `orchestrate`.** Operator pattern. Decomposes a task, dispatches the right specialist agents in parallel/sequence, synthesizes one consolidated result. Replaces ad-hoc "run reviewer then run tests then update docs" sequences.
+- **New skill: `pr-prep`.** Stage → test → security → match house style → draft PR title/body. Stops before push.
+- **Statusline.** `templates/statusline.sh` — branch, dirty count, model, optional ccusage cost block. Wired into the settings template.
+- **Devcontainer template.** `templates/devcontainer/` — sandboxed VS Code container for `--dangerously-skip-permissions` work. No Docker socket, no SSH/AWS mounts, persistent volume for `~/.claude`.
+- **GitHub Actions template.** `templates/github-workflows/claude-pr-review.yml` using `anthropics/claude-code-action@v1`. Runs on PR open and `@claude` comments.
+- **Permissions widened.** Added `git worktree*` to allow list (for the new worktree-aware patterns); added `docs.claude.com` and `code.claude.com` to allowed `WebFetch` domains.
 
 ---
 

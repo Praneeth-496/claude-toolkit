@@ -1,0 +1,15 @@
+{
+  "name": "claude-toolkit-marketplace",
+  "owner": {
+    "name": "Praneeth Dathu",
+    "url": "https://github.com/Praneeth-496"
+  },
+  "plugins": [
+    {
+      "name": "claude-toolkit",
+      "source": "github:Praneeth-496/claude-toolkit",
+      "path": "claude-toolkit",
+      "description": "Portable Claude Code context, skills, hooks, and guard rails. Includes file-based memory (auto-memory, refresh-memory, memory-graph), council orchestration, numeric-claim verification, sync-rsync, submit-slurm, and run-pipeline."
+    }
+  ]
+}
