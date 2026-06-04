@@ -127,16 +127,19 @@ gh secret set ANTHROPIC_API_KEY
 npm install -g ccusage
 ```
 
-### Plugin install (recommended as of 0.5.0)
+### Plugin install (recommended) — use the `claude plugin` CLI
 
-The toolkit ships a `.claude-plugin/plugin.json` manifest, so it installs via Claude Code's native plugin system — set up once, live in every project:
+The toolkit ships a `.claude-plugin/plugin.json` manifest, so it installs via Claude Code's plugin system — set up once, live in every project. Use the **terminal CLI** (works everywhere, including the VS Code/IDE extensions where the interactive `/plugin` slash command is not available). Note the source format is `owner/repo`, not `github:owner/repo`:
 
+```bash
+claude plugin marketplace add Praneeth-496/claude-toolkit
+claude plugin install claude-toolkit
+# then restart the Claude Code session so it loads
 ```
-/plugin marketplace add github:Praneeth-496/claude-toolkit
-/plugin install claude-toolkit
-```
 
-This also activates the **bundled zero-dependency MCP server** (`mcp/index.mjs`, registered by `.mcp.json`) exposing `verify_result_claim`, `query_graph`, `memory_graph_add`, and `placeholder_scan` as callable tools, plus the `/toolkit-init` command and the plugin-active hooks. No `npm install` needed. Step-by-step: [`ADD-TO-ANY-PROJECT.md`](ADD-TO-ANY-PROJECT.md) · full reference: [`claude-toolkit/docs/PLUGIN.md`](claude-toolkit/docs/PLUGIN.md).
+It installs at user scope, enabled by default. This also activates the **bundled zero-dependency MCP server** (`mcp/index.mjs`, registered by `.mcp.json`) exposing `verify_result_claim`, `query_graph`, `memory_graph_add`, and `placeholder_scan`, plus the `/toolkit-init` command and the plugin-active hooks. No `npm install` needed. Verify with `claude plugin list` / `claude plugin details claude-toolkit`. Step-by-step: [`ADD-TO-ANY-PROJECT.md`](ADD-TO-ANY-PROJECT.md) · full reference: [`claude-toolkit/docs/PLUGIN.md`](claude-toolkit/docs/PLUGIN.md).
+
+> The `/plugin marketplace add …` **slash command** is an alternative that only works in the Claude Code terminal TUI (not in bash, not in the VS Code extension). The CLI above is the reliable path.
 
 Plugin install gives namespaced skills (`/claude-toolkit:auto-memory`), the MCP tools, and version-pinned updates; `install.sh` gives unprefixed skills and direct file ownership but no MCP server. Pick one — running both will fight for the same skill names.
 

@@ -206,8 +206,8 @@ const html = `<!doctype html>
 </main>
 
 <footer>
-  Install: <code>/plugin marketplace add github:Praneeth-496/claude-toolkit</code> then <code>/plugin install claude-toolkit</code>.
-  Regenerate this page with <code>node dashboard/build.mjs</code>.
+  Install (terminal): <code>claude plugin marketplace add Praneeth-496/claude-toolkit</code> then <code>claude plugin install claude-toolkit</code>, then restart Claude Code.
+  Full guide: <code>docs/install.html</code> · regenerate this page with <code>node dashboard/build.mjs</code>.
 </footer>
 
 <script>

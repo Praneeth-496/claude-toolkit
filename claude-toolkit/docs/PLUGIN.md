@@ -47,25 +47,28 @@ A few techniques exist in **both** forms on purpose: the *skill* is the auto-rou
 
 ## Install (one-time, then live everywhere)
 
-```text
-/plugin marketplace add github:Praneeth-496/claude-toolkit
-/plugin install claude-toolkit
+Use the **`claude plugin` CLI** in a terminal. It works everywhere, including IDE/VS Code extensions where the interactive `/plugin` slash command is unavailable. The source is `owner/repo` (not `github:owner/repo`):
+
+```bash
+claude plugin marketplace add Praneeth-496/claude-toolkit
+claude plugin install claude-toolkit
 ```
 
-Restart the session. The plugin is user-scope, so it is live in **every** project from then on. Verify with `/plugin` (lists `claude-toolkit` enabled) and `/mcp` (shows the `claude-toolkit` server with its 4 tools). No `npm install`, no per-project setup.
+It installs at **user scope, enabled by default**. **Restart the Claude Code session** so it loads; it is then live in **every** project. Verify in a terminal with `claude plugin list` (→ `claude-toolkit` enabled) and `claude plugin details claude-toolkit` (full inventory + token cost). After restart, inside the chat: `/mcp` shows the `claude-toolkit` server with 4 tools, and `/claude-toolkit:` lists the 30 skills. No `npm install`, no per-project setup.
+
+> The `/plugin marketplace add …` slash command is an alternative that only works in the Claude Code terminal TUI. In bash it errors `No such file or directory`; in the VS Code extension it errors `/plugin isn't available in this environment`. Use the CLI above.
 
 ## Per new project (optional)
 
-```text
-/toolkit-init           # drop CLAUDE.md / CONTEXT.md / settings.local.json templates, then fill placeholders
-```
+Inside the Claude Code chat, type `/toolkit-init` to drop `CLAUDE.md` / `CONTEXT.md` / `settings.local.json` templates, then fill placeholders.
 
 ## Updating
 
-```text
-/plugin marketplace update claude-toolkit-marketplace
-/plugin update claude-toolkit
+```bash
+claude plugin marketplace update claude-toolkit-marketplace
 ```
+
+To turn the plugin off/on in a terminal: `claude plugin disable claude-toolkit` / `claude plugin enable claude-toolkit`. (Don't paste the `disable` line by accident — it switches the plugin OFF.)
 
 ## Recommended companions (NOT bundled — install separately)
 

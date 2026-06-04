@@ -6,44 +6,41 @@ Two ways. **Use the plugin** (recommended — set up once, live in every project
 
 ## Option A — Plugin (recommended, zero per-project setup)
 
-> **These are Claude Code slash commands, NOT bash commands.** Start Claude Code first
-> (run `claude` in your terminal, or open the IDE extension), then type the lines below
-> at the Claude Code prompt — not at your shell `$` prompt. Typing `/plugin` in bash gives
-> `bash: /plugin: No such file or directory`.
+Use the **`claude plugin` CLI** in a normal terminal. This is the reliable method and works everywhere, including the VS Code / IDE extensions where the interactive `/plugin` slash command is **not** available.
 
-Do this **once** on a machine, inside a Claude Code session:
+> The `/plugin` slash command (`/plugin marketplace add …`) only works in the Claude Code **terminal TUI**, and not at all in your bash shell. If `/plugin` gave you `No such file or directory` (bash) or `/plugin isn't available in this environment` (VS Code), use the CLI below instead.
 
-```text
-/plugin marketplace add github:Praneeth-496/claude-toolkit
-/plugin install claude-toolkit
+Run these **once** in a terminal (these ARE bash commands — note `claude plugin …`, and the source is `owner/repo`, not `github:owner/repo`):
+
+```bash
+claude plugin marketplace add Praneeth-496/claude-toolkit
+claude plugin install claude-toolkit
 ```
 
-Restart the session (or run `/reload-plugins`). That's it. From now on, **every project you open** automatically has:
+That's it — it installs at **user scope and is enabled by default**. **Restart your Claude Code session** (close/reopen the IDE panel, or start a new chat) so it loads. From then on, **every project** automatically has:
 
-- 25 auto-routing skills (memory graph, council, verify-claim, slurm, sync, env-bootstrap, 10x, scout, ...)
-- 8 review subagents (adversary, code-reviewer, fact-checker, ...)
+- 30 auto-routing skills (memory graph, council, verify-claim, brainstorm, debate, refine-loop, env-bootstrap, 10x, scout, …)
+- 14 subagents (review + verification/anti-hallucination: cove-verifier, citation-auditor; + ideation: ideator, synthesizer, premortem, …)
 - 4 safety hooks (block dangerous bash, block global pip, format-on-write, git session briefing)
 - 4 MCP tools (`verify_result_claim`, `query_graph`, `memory_graph_add`, `placeholder_scan`)
 
 No `npm install`, no copying files. The MCP server is dependency-free (plain Node ≥18).
 
-**Verify it loaded:**
-```text
-/plugin      → claude-toolkit shows as enabled
-/mcp         → claude-toolkit server lists 4 tools
+**Verify it loaded (in a terminal):**
+```bash
+claude plugin list                  # claude-toolkit -> Status: ✔ enabled
+claude plugin details claude-toolkit  # full component inventory + token cost
+```
+And after restarting the session, inside the Claude Code chat: type `/claude-toolkit:` to see the 30 skills.
+
+**Bootstrap a new repo's context files (optional, inside Claude Code chat):** type `/toolkit-init` — drops `.claude/CLAUDE.md`, `.claude/CONTEXT.md`, `.claude/settings.local.json` and lists the `<PLACEHOLDER>` markers.
+
+**Update to a new version later (terminal):**
+```bash
+claude plugin marketplace update claude-toolkit-marketplace
 ```
 
-**Bootstrap a new repo's context files (optional, per project):**
-```text
-/toolkit-init
-```
-This drops `.claude/CLAUDE.md`, `.claude/CONTEXT.md`, and `.claude/settings.local.json`, then lists the `<PLACEHOLDER>` markers to fill in.
-
-**Update later:**
-```text
-/plugin marketplace update claude-toolkit-marketplace
-/plugin update claude-toolkit
-```
+> Do not paste `claude plugin disable claude-toolkit` from any reference — that turns the plugin OFF. To turn it back on: `claude plugin enable claude-toolkit`.
 
 ---
 
