@@ -1,7 +1,7 @@
 {
   "name": "claude-toolkit",
-  "description": "Portable Claude Code context, 25 skills, 8 review agents, safety hooks, a /toolkit-init bootstrap command, and a bundled zero-dependency MCP server (verify_result_claim, query_graph, memory_graph_add, placeholder_scan). File-based + graph memory, council orchestration, numeric-claim verification, HPC/SLURM helpers, devcontainer-ready security.",
-  "version": "0.5.0",
+  "description": "Portable Claude Code context, 30 skills, 14 agents (review + verification/anti-hallucination + ideation), safety hooks, a /toolkit-init bootstrap command, and a bundled zero-dependency MCP server (verify_result_claim, query_graph, memory_graph_add, placeholder_scan). File-based + graph memory, council/debate orchestration, Chain-of-Verification + citation auditing, divergent->convergent brainstorming, HPC/SLURM helpers, devcontainer-ready security.",
+  "version": "0.6.0",
   "skills": "./skills-generic",
   "author": {
     "name": "Praneeth Dathu",

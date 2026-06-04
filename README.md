@@ -158,13 +158,13 @@ Plugin install gives namespaced skills (`/claude-toolkit:auto-memory`), the MCP 
 | `orchestrate` | opus | Operator/orchestrator pattern. Decomposes a task, dispatches specialists (`code-reviewer`, `security-auditor`, `test-runner`, `simplifier`, `doc-writer`, `adversary`) in parallel/sequence, synthesizes one consolidated result. |
 | `pr-prep` | sonnet | End-to-end PR prep: snapshot diff, run tests via `test-runner`, security pass via `security-auditor`, match the project's house style by reading recent merged PRs, draft title + body. **Stops before push.** |
 
-Plus **`session-watchdog`** (haiku, checkpoint + auto-resume), **`env-bootstrap`** (sonnet, mandatory per-project isolated env), and 12 **thinking/style** skills that match on natural-language phrases (no slash needed): `10x`, `brief`, `godmode`, `scout`, `critique`, `devil`, `compare`, `pitch`, `teacher`, `explainlikeim5`, `humanizer`, `ooda`. **25 skills total.**
+Plus **`session-watchdog`** (haiku, checkpoint + auto-resume), **`env-bootstrap`** (sonnet, mandatory per-project isolated env), and 12 **thinking/style** skills that match on natural-language phrases (no slash needed): `10x`, `brief`, `godmode`, `scout`, `critique`, `devil`, `compare`, `pitch`, `teacher`, `explainlikeim5`, `humanizer`, `ooda`. Plus 5 **agentic-loop** skills: `consistency-checker`, `refine-loop`, `debate`, `vote`, `brainstorm`. **30 skills total.**
 
 `skills-examples/edit-doc-strict/` is a reference pattern — not auto-installed. Copy and adapt it when a single document (thesis, spec, RFC, release notes) needs hard style/correctness rules.
 
 ## Project-scope agents (installed to `.claude/agents/`)
 
-Six specialist subagents are checked into every project on install. Use them via `Task` tool (Claude routes by description) or invoke explicitly: "use the code-reviewer agent on this diff".
+Fourteen specialist subagents are checked into every project on install: 8 review, 2 verification/anti-hallucination, 4 ideation/critique. Use them via `Task` tool (Claude routes by description) or invoke explicitly: "use the code-reviewer agent on this diff".
 
 | Agent | Model | Tools | Purpose |
 |---|---|---|---|
@@ -176,6 +176,12 @@ Six specialist subagents are checked into every project on install. Use them via
 | `doc-writer` | sonnet | edit (docs only) | Updates docstrings, README, CHANGELOG to match a code change |
 | `fact-checker` | sonnet | read-only | Verifies individual factual claims (paths, symbols, line numbers, numbers, API signatures, commit hashes, citations) against the repo. Returns VERIFIED / UNVERIFIED / FALSE per claim. Verdict: ship / revise / reject. |
 | `flow-auditor` | opus | read-only | Verifies the *reasoning chain* between claims: does each conclusion follow from the evidence cited? Catches OVERREACH, UNSUPPORTED leaps, and CONTRADICTED steps. Returns: accept / re-run-failing-steps / discard-chain. |
+| `cove-verifier` | opus | read-only + web | Chain-of-Verification: derives independent verification questions, answers them in isolation, flags/revises contradicted claims (Dhuliawala 2023). |
+| `citation-auditor` | sonnet | read-only + web | Per-claim source grounding: labels each factual atom Supported / Unsupported / Contradicted with a citation; catches fake papers, DOIs, APIs (RARR/AIS). |
+| `ideator` | sonnet | read-only | Divergent generator with diversity-forcing (ordinary-persona sampling, axis variation) so ideas don't homogenize. Pairs with `synthesizer`. |
+| `synthesizer` | opus | read-only | Convergent closer: clusters, scores against explicit criteria, recommends a shortlist with a "fails if…" condition. |
+| `premortem` | sonnet | read-only | Prospective hindsight: assumes the plan failed, enumerates causes (L×I) and detect-early mitigations (Klein). |
+| `assumption-surfacer` | sonnet | read-only | Toulmin-maps a claim to surface the implicit warrants it silently depends on; verifies the load-bearing ones. |
 
 The `orchestrate` skill knows about these and dispatches them as a team. The `pr-prep` skill chains `test-runner` + `security-auditor`. Use them individually for narrow tasks, or via `orchestrate` for cross-cutting reviews.
 
@@ -241,6 +247,16 @@ If you genuinely need *cross-vendor* model diversity (e.g. you're choosing betwe
 Rule of thumb: bundled `council` for design questions, `/ultrareview` for branch reviews, external `agent-council` only when the decision is specifically about non-Claude models.
 
 ---
+
+## What changed in 0.6.0
+
+- **Agentic expansion — 6 new agents + 5 new skills (research-backed).** Grows the toolkit from 8→14 agents and 25→30 skills, deliberately filling only the genuine gaps (verification, anti-hallucination, orchestration loops, ideation), not rebuilding the orchestration/consensus that the wider ecosystem already covers. Every component is project-agnostic and tied to a primary source.
+  - Verification / anti-hallucination: `cove-verifier` (Chain-of-Verification, Dhuliawala 2023), `citation-auditor` (RARR/AIS source grounding), `consistency-checker` skill (SelfCheckGPT, Manakul 2023).
+  - Orchestration loops: `refine-loop` (evaluator-optimizer, gated on a real external signal — Reflexion/Self-Refine), `debate` (judged multi-round, capped — Du 2023), `vote` (self-consistency — Wang 2022).
+  - Ideation / critique: `ideator` (diversity-forced divergent generation — Anderson 2024 homogenization), `synthesizer` (convergent closer), `premortem` (Klein 2007), `assumption-surfacer` (Toulmin), and a `brainstorm` pipeline that wires them divergent→convergent.
+- **Evidence-honesty baked into the prompts:** every verifier requires an external signal (naive self-correction degrades reasoning — Huang 2023); debate is capped and defers to `vote` for discrete answers; ideation forces diversity by default. Full rationale + 18 sources in [`docs/agentic-expansion-plan.html`](claude-toolkit/docs/agentic-expansion-plan.html) (Anthropic-themed).
+- **Install fix:** root-level `.claude-plugin/marketplace.json` + `"skills": "./skills-generic"` in `plugin.json` so `/plugin marketplace add github:Praneeth-496/claude-toolkit` + `/plugin install claude-toolkit` actually work and load all skills.
+- **LICENSE** added (MIT-0, matching the manifest). **Dashboard** re-themed to the Anthropic palette and now lists all 14 agents / 30 skills.
 
 ## What changed in 0.5.0
 

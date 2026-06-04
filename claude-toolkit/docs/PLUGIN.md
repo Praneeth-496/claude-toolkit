@@ -6,19 +6,22 @@ As of v0.5.0 the toolkit installs as a **Claude Code plugin from GitHub** (it al
 
 | Component | Where | Loaded |
 |---|---|---|
-| 25 skills | `skills-generic/` | auto-discovered, auto-routed by `description:` |
-| 8 review subagents | `agents/` | available to the `Task` tool |
+| 30 skills | `skills-generic/` | auto-discovered, auto-routed by `description:` |
+| 14 subagents | `agents/` | available to the `Task` tool |
 | 4 safety hooks | `hooks/hooks.json` → `templates/hooks/` | fire on Bash / Edit·Write / SessionStart |
 | `/toolkit-init` command | `commands/` | bootstraps templates into a repo |
 | Bundled MCP server | `mcp/index.mjs` + `.mcp.json` | 4 tools + 1 resource, over stdio, zero deps |
 | Project templates | `templates/` | copied by `/toolkit-init` or `install.sh` |
 
-### Skills (25)
+### Skills (30)
 - **Workflow (13):** auto-memory, council, memory-graph, query-graph, refresh-memory, run-pipeline, session-watchdog, submit-slurm, sync-rsync, verify-result-claim, orchestrate, pr-prep, env-bootstrap
+- **Agentic loops (5):** consistency-checker (SelfCheckGPT triage), refine-loop (evaluator-optimizer, external-signal gated), debate (judged multi-round), vote (self-consistency), brainstorm (divergent->convergent pipeline)
 - **Thinking/style (12):** 10x, brief, godmode, scout, critique, devil, compare, pitch, teacher, explainlikeim5, humanizer, ooda
 
-### Subagents (8)
-adversary, code-reviewer, fact-checker, flow-auditor, simplifier, doc-writer, test-runner, security-auditor.
+### Subagents (14)
+- **Review (8):** adversary, code-reviewer, fact-checker, flow-auditor, simplifier, doc-writer, test-runner, security-auditor.
+- **Verification / anti-hallucination (2):** cove-verifier (Chain-of-Verification), citation-auditor (per-claim source grounding).
+- **Ideation / critique (4):** ideator (diversity-forced divergent), synthesizer (convergent closer), premortem (prospective-hindsight risk), assumption-surfacer (Toulmin implicit-assumption finder).
 
 ### Hooks (4, plugin-active)
 `hooks/hooks.json` wires these `templates/hooks/` scripts so they fire in **every** project the plugin is enabled in:

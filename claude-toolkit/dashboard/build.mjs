@@ -109,58 +109,58 @@ const html = `<!doctype html>
 <title>claude-toolkit · dashboard</title>
 <style>
   :root{
-    --bg:#0b0e14; --panel:#121723; --panel2:#171d2b; --line:#222a3a;
-    --ink:#e6edf3; --dim:#8b97a8; --accent:#7c9cff; --accent2:#5ce6c0;
-    --warn:#ffb454; --pink:#ff7eb6;
+    --bg:#F0EEE6; --panel:#FAF9F5; --panel2:#FFFFFF; --line:#E4E0D6; --line2:#D9D4C7;
+    --ink:#1A1A17; --dim:#6B6960; --accent:#CC785C; --accent2:#B05C3F;
+    --slate:#345E8B; --olive:#5F7A5A; --plum:#7A4A86;
   }
   *{box-sizing:border-box}
-  body{margin:0;font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
-    background:radial-gradient(1200px 600px at 80% -10%,#1a2236 0,var(--bg) 55%) fixed;color:var(--ink)}
-  a{color:var(--accent);text-decoration:none}
-  header.hero{padding:54px 24px 30px;max-width:1180px;margin:0 auto}
+  body{margin:0;font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,#F5F2EA 0,var(--bg) 320px) fixed;color:var(--ink);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2);text-decoration:none}
+  .serif,h1,h2,.stat b{font-family:Georgia,"Iowan Old Style","Times New Roman",Tiempos,serif}
+  header.hero{padding:56px 24px 28px;max-width:1180px;margin:0 auto}
   .logo{display:flex;align-items:center;gap:14px}
   .logo .mark{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;font-weight:800;color:#0b0e14;font-size:22px;box-shadow:0 8px 30px rgba(124,156,255,.35)}
-  h1{font-size:30px;margin:0;letter-spacing:-.5px}
+    display:grid;place-items:center;font-weight:800;color:#FBFAF7;font-size:21px;box-shadow:0 6px 22px rgba(204,120,92,.32)}
+  h1{font-size:31px;margin:0;letter-spacing:-.4px}
   .ver{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent2);
-    border:1px solid var(--line);padding:3px 9px;border-radius:999px;background:var(--panel)}
-  .tag{color:var(--dim);margin:10px 0 0;max-width:680px}
+    border:1px solid var(--line2);padding:3px 9px;border-radius:999px;background:#FBEEE7}
+  .tag{color:var(--dim);margin:12px 0 0;max-width:680px}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:26px 0 6px}
-  .stat{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
-    border-radius:16px;padding:18px 18px}
-  .stat b{display:block;font-size:30px;letter-spacing:-1px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px}
+  .stat b{display:block;font-size:30px;letter-spacing:-.5px}
   .stat span{color:var(--dim);font-size:13px}
-  .stat.s1 b{color:var(--accent)} .stat.s2 b{color:var(--accent2)}
-  .stat.s3 b{color:var(--warn)} .stat.s4 b{color:var(--pink)}
+  .stat.s1 b{color:var(--accent)} .stat.s2 b{color:var(--slate)}
+  .stat.s3 b{color:var(--olive)} .stat.s4 b{color:var(--plum)}
   .toolbar{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);
-    background:rgba(11,14,20,.7);border-bottom:1px solid var(--line)}
+    background:rgba(240,238,230,.82);border-bottom:1px solid var(--line)}
   .toolbar .inner{max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  #q{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  #q{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink);
     padding:11px 14px;border-radius:12px;font-size:14px;outline:none}
   #q:focus{border-color:var(--accent)}
   .nav{display:flex;gap:8px;flex-wrap:wrap}
-  .nav a{font-size:13px;color:var(--dim);border:1px solid var(--line);padding:7px 11px;border-radius:10px;background:var(--panel)}
+  .nav a{font-size:13px;color:var(--dim);border:1px solid var(--line2);padding:7px 11px;border-radius:10px;background:var(--panel)}
   .nav a:hover{color:var(--ink);border-color:var(--accent)}
   main{max-width:1180px;margin:0 auto;padding:8px 24px 70px}
   section{margin:34px 0}
-  h2{font-size:18px;display:flex;align-items:center;gap:10px;margin:0 0 14px}
-  .count{font:600 12px ui-monospace,monospace;color:var(--dim);border:1px solid var(--line);
-    padding:2px 8px;border-radius:999px}
+  h2{font-size:20px;display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .count{font:600 12px ui-monospace,monospace;color:var(--dim);border:1px solid var(--line2);
+    padding:2px 8px;border-radius:999px;background:var(--panel)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
     transition:transform .12s,border-color .12s,box-shadow .12s}
-  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 24px rgba(60,50,40,.08)}
   .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .card h3{margin:0;font:600 15px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink)}
   .card .sub{color:var(--dim);font-size:12px;margin-top:2px}
-  .card p{margin:9px 0 0;color:#c6d0de;font-size:13.5px}
-  .pill{font:600 10px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
-  .pill.opus{color:var(--pink);border-color:#3a2433} .pill.sonnet{color:var(--accent);border-color:#23304d}
-  .pill.haiku{color:var(--accent2);border-color:#1d3b35}
+  .card p{margin:9px 0 0;color:#33312B;font-size:13.5px}
+  .pill{font:600 10px ui-monospace,monospace;padding:3px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--slate);background:#F4F1EA}
+  .pill.opus{color:var(--plum);border-color:#E3D3E8;background:#F8F1FA} .pill.sonnet{color:var(--slate);border-color:#D2DEEC;background:#EFF4FA}
+  .pill.haiku{color:var(--olive);border-color:#D2E0CE;background:#EFF5ED}
   .empty{display:none;color:var(--dim);padding:30px 0;text-align:center}
   footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;color:var(--dim);font-size:13px}
-  code{background:var(--panel2);border:1px solid var(--line);padding:2px 7px;border-radius:7px;
-    font:13px ui-monospace,monospace;color:var(--accent2)}
+  code{background:#EFEBE1;border:1px solid var(--line);padding:2px 7px;border-radius:7px;
+    font:13px ui-monospace,monospace;color:#7A4A2C}
   .no-match section{display:none}
 </style>
 </head>

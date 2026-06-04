@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>claude-toolkit · Agentic Expansion Plan</title>
+<style>
+  :root{
+    --bg:#F0EEE6;            /* Anthropic "cloud" ivory */
+    --surface:#FAF9F5;
+    --surface2:#FFFFFF;
+    --ink:#1A1A17;           /* soft black */
+    --dim:#6B6960;
+    --faint:#8B887E;
+    --accent:#CC785C;        /* Anthropic clay / book-cloth */
+    --accent-deep:#B05C3F;
+    --line:#E4E0D6;
+    --line2:#D9D4C7;
+    --slate:#5B5A52;
+    --good:#5F7A5A;
+    --warn:#B07B2F;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .serif{font-family:Georgia,"Iowan Old Style","Times New Roman",Tiempos,serif}
+  a{color:var(--accent-deep);text-decoration:none;border-bottom:1px solid rgba(176,92,63,.25)}
+  a:hover{border-bottom-color:var(--accent-deep)}
+  .wrap{max-width:980px;margin:0 auto;padding:0 26px}
+
+  header{padding:64px 0 30px;border-bottom:1px solid var(--line)}
+  .kicker{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent-deep)}
+  h1{font-size:42px;line-height:1.12;margin:14px 0 10px;letter-spacing:-.5px}
+  .lede{font-size:18px;color:var(--dim);max-width:680px;margin:0}
+  .badge{display:inline-flex;align-items:center;gap:8px;margin-top:20px;background:#FBEEE7;
+    border:1px solid #E9C9B8;color:#9A4A2C;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:34px 0 4px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .stat b{font-family:Georgia,serif;font-size:30px;display:block;line-height:1}
+  .stat span{color:var(--dim);font-size:13px}
+
+  section{padding:42px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:13px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--accent-deep);margin:0 0 6px}
+  h2 + .h2sub{font-family:Georgia,serif;font-size:27px;margin:0 0 20px;letter-spacing:-.3px}
+  h3{font-family:Georgia,serif;font-size:20px;margin:30px 0 12px}
+  p{margin:0 0 14px}
+  .muted{color:var(--dim)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+  .card{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:18px 19px;
+    transition:border-color .15s,box-shadow .15s,transform .15s}
+  .card:hover{border-color:var(--line2);box-shadow:0 6px 22px rgba(60,50,40,.06);transform:translateY(-2px)}
+  .card .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .card .name{font:600 16px ui-monospace,SFMono-Regular,Menlo,monospace}
+  .card .what{font-size:14px;color:#33312B;margin:0 0 12px}
+  .card .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .src{font-size:12px;color:var(--faint);margin-top:10px;border-top:1px dashed var(--line2);padding-top:9px}
+
+  .pill{font:600 11px/1 ui-monospace,monospace;padding:4px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--slate);background:#F4F1EA;white-space:nowrap}
+  .pill.opus{color:#7A4A86;border-color:#E3D3E8;background:#F8F1FA}
+  .pill.sonnet{color:#345E8B;border-color:#D2DEEC;background:#EFF4FA}
+  .pill.haiku{color:#3E7A6E;border-color:#CFE6DF;background:#EEF7F4}
+  .pill.ro{color:var(--good);border-color:#D2E0CE;background:#EFF5ED}
+  .pill.skill{color:#8A5A2A;border-color:#EAD8C2;background:#FAF2E7}
+  .pill.agent{color:#9A4A2C;border-color:#E9CDBE;background:#FBEFE8}
+  .pill.p1{color:#fff;background:var(--accent);border-color:var(--accent)}
+  .pill.p2{color:var(--accent-deep);background:#FBEEE7;border-color:#E9C9B8}
+  .pill.p3{color:var(--slate);background:#F2EFE8;border-color:var(--line2)}
+
+  .group-label{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
+  .group-label .n{font-family:Georgia,serif;font-size:22px}
+  .group-label .tagline{color:var(--dim);font-size:14px}
+
+  .principles{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 24px 14px}
+  .principles li{margin:14px 0;padding-left:4px}
+  .principles b{color:var(--ink)}
+  .ev{display:inline-block;font-size:12.5px;color:var(--warn);background:#FBF3E3;border:1px solid #EAD9B8;
+    border-radius:6px;padding:1px 7px;margin-left:4px}
+
+  .nope{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+  .nope div{background:#F4F1EA;border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:14px}
+  .nope b{font-family:ui-monospace,monospace;font-size:13px}
+
+  .phase{border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin:0 0 26px}
+  .phase h3{margin:0 0 4px}
+  .phase .tag{font-size:13px;color:var(--accent-deep);font-weight:600}
+
+  table.src-tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.src-tbl td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.src-tbl td:first-child{color:var(--faint);white-space:nowrap;width:1%;padding-right:16px;font-family:ui-monospace,monospace;font-size:12px}
+
+  footer{padding:40px 0 70px;color:var(--dim);font-size:14px}
+  .cta{background:#FBEEE7;border:1px solid #E9C9B8;border-radius:14px;padding:20px 22px;margin-bottom:24px}
+  .cta b{color:#9A4A2C}
+  code{background:#EFEBE1;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font:13px ui-monospace,monospace;color:#7A4A2C}
+  sup a{font-size:11px;border:none;color:var(--accent-deep);font-weight:700}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="kicker">claude-toolkit · design proposal</div>
+  <h1 class="serif">Making the toolkit genuinely agentic</h1>
+  <p class="lede">A research-backed plan to grow beyond 8 review agents into a disciplined set of verifiers, anti-hallucination checks, orchestration loops, and idea-exploration agents — without rebuilding what the ecosystem already covers.</p>
+  <span class="badge"><span class="dot"></span> Status: all 11 components built &amp; shipped in v0.6.0. This page is the design rationale + sources.</span>
+
+  <div class="stats">
+    <div class="stat"><b>8</b><span>review agents today</span></div>
+    <div class="stat"><b>25</b><span>skills today</span></div>
+    <div class="stat"><b>+11</b><span>proposed (3 phases)</span></div>
+    <div class="stat"><b>15</b><span>papers reviewed</span></div>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <h2>Where we are</h2>
+  <div class="h2sub serif">Strong on review, thin on verification, orchestration loops, and ideation</div>
+  <p>The current 8 agents cover review well — <code>code-reviewer</code>, <code>security-auditor</code>, <code>simplifier</code>, <code>test-runner</code>, <code>doc-writer</code>, plus three "thinking" agents: <code>adversary</code> (steelman), <code>fact-checker</code> (repo-grounded claims), <code>flow-auditor</code> (reasoning-chain audit).</p>
+  <p>An inventory of your installed plugins shows orchestration and consensus are <b>already saturated</b> elsewhere (ruflo swarm coordinators, cc10x planner/verifier, ~95 project agents incl. byzantine/raft/gossip consensus, swarm topologies). So the real, unfilled gaps are narrower than "add lots of agents":</p>
+  <ol class="muted">
+    <li><b>Only one fact-checker</b>, and it only grounds against <i>this repo</i> — no external/citation verifier, no sampling-based hallucination check, no Chain-of-Verification.</li>
+    <li><b>No orchestration <i>loops</i></b> — <code>council</code> and <code>orchestrate</code> are one-shot; nothing iterates to convergence or runs a judged debate.</li>
+    <li><b>No ideation agents</b> — creativity exists only as one-shot skills (<code>devil</code>, <code>critique</code>, <code>10x</code>).</li>
+    <li><b>No convergence step</b> — divergent generation has no paired "cluster, score, shortlist" closer.</li>
+  </ol>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Proposed additions</h2>
+  <div class="h2sub serif">Eleven components across four buckets, each tied to a primary source</div>
+
+  <!-- A -->
+  <div class="group-label"><span class="n serif">A.</span><b>Verification &amp; anti-hallucination</b><span class="tagline">— the highest-ROI bucket: coding gives real external signals to check against</span></div>
+  <div class="grid">
+    <div class="card">
+      <div class="top"><span class="name">cove-verifier</span><span class="pill p1">P1</span></div>
+      <p class="what">Chain-of-Verification: takes a claim/answer, generates independent verification questions, answers them in isolation, and revises/flags anything contradicted.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill opus">opus</span><span class="pill ro">read-only</span></div>
+      <div class="src">Dhuliawala et al. 2023, CoVe<sup><a href="#s1">[1]</a></sup> · tools: Read, Grep, Web</div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">citation-auditor</span><span class="pill p1">P1</span></div>
+      <p class="what">Per-claim external grounding. For every factual sentence, retrieves evidence and labels it Supported / Unsupported / Contradicted with a source. Catches fake papers, wrong DOIs, invented APIs.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill sonnet">sonnet</span><span class="pill opus">opus*</span><span class="pill ro">read-only</span></div>
+      <div class="src">RARR (Gao 2022) + AIS (Rashkin 2021) + "According-to"<sup><a href="#s4">[4]</a><a href="#s5">[5]</a></sup> · tools: Web, Read, Grep</div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">consistency-checker</span><span class="pill p1">P1</span></div>
+      <p class="what">SelfCheckGPT-style triage: re-samples a claim N times and flags sentences that diverge across samples. Source-free; escalates suspicious lines to citation-auditor.</p>
+      <div class="meta"><span class="pill skill">skill</span><span class="pill haiku">haiku ×N</span><span class="pill sonnet">sonnet</span></div>
+      <div class="src">Manakul et al. 2023, SelfCheckGPT<sup><a href="#s2">[2]</a></sup> · model-only, no external deps</div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:14px;font-size:14px">Your existing <code>fact-checker</code> stays as the repo-grounding layer; these add the external, sampling, and CoVe layers it lacks. A "second opinion" check is free: run <code>fact-checker</code> under a different model for cross-model corroboration.</p>
+
+  <!-- B -->
+  <div class="group-label" style="margin-top:34px"><span class="n serif">B.</span><b>Orchestration loops</b><span class="tagline">— what council/orchestrate don't do: iterate and debate</span></div>
+  <div class="grid">
+    <div class="card">
+      <div class="top"><span class="name">refine-loop</span><span class="pill p2">P2</span></div>
+      <p class="what">Evaluator–optimizer loop: a generator drafts, an evaluator runs the <b>real check</b> (tests, or <code>verify-result-claim</code> against a results JSON), writes a critique, generator retries. Stops on pass or 3 iterations.</p>
+      <div class="meta"><span class="pill skill">skill</span><span class="pill sonnet">gen: sonnet</span><span class="pill opus">eval: opus</span></div>
+      <div class="src">Reflexion (Shinn 2023) + Self-Refine (Madaan 2023)<sup><a href="#s8">[8]</a><a href="#s9">[9]</a></sup> · gated on an external signal (see principles)</div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">debate</span><span class="pill p2">P2</span></div>
+      <p class="what">Adversarial multi-round consensus for contested-correctness questions ("is this concurrency-safe?"). 2–3 agents read each other and revise; a judge declares consensus. Capped at 2–3 rounds.</p>
+      <div class="meta"><span class="pill skill">skill</span><span class="pill sonnet">debaters</span><span class="pill opus">judge</span></div>
+      <div class="src">Du 2023 + Liang 2023 (divergent-thinking debate)<sup><a href="#s6">[6]</a><a href="#s7">[7]</a></sup></div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">vote</span><span class="pill p3">P3</span></div>
+      <p class="what">Self-consistency wrapper for discrete answers (classification, "which of these 3?"). Sample k=5, majority-vote, report agreement. Cheapest reliability boost there is.</p>
+      <div class="meta"><span class="pill skill">skill</span><span class="pill haiku">haiku/sonnet ×5</span></div>
+      <div class="src">Wang et al. 2022, Self-Consistency<sup><a href="#s3">[3]</a></sup> · only for votable answers</div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="group-label" style="margin-top:34px"><span class="n serif">C.</span><b>Ideation &amp; creativity</b><span class="tagline">— essentially absent today; diversity-forcing is non-negotiable</span></div>
+  <div class="grid">
+    <div class="card">
+      <div class="top"><span class="name">ideator</span><span class="pill p2">P2</span></div>
+      <p class="what">Pure divergent generator. Emits N ideas under <b>diversity-forcing</b>: randomly-sampled <i>ordinary</i> personas (not "Steve Jobs"), constraint variation, and an explicit "now diverge from your previous ideas" step. No self-judging.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill sonnet">sonnet</span><span class="pill ro">read-only</span></div>
+      <div class="src">Deng/Brucks/Toubia 2025; homogenization: Anderson 2024, Nature HB 2025<sup><a href="#s11">[11]</a><a href="#s12">[12]</a></sup></div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">synthesizer</span><span class="pill p2">P2</span></div>
+      <p class="what">The convergent closer. Clusters many raw ideas, scores them against explicit criteria, and recommends a shortlist with rationale. The missing second half of divergent → convergent.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill opus">opus</span><span class="pill ro">read-only</span></div>
+      <div class="src">Guilford divergent/convergent; over-generate-then-cluster<sup><a href="#s10">[10]</a></sup></div>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="group-label" style="margin-top:34px"><span class="n serif">D.</span><b>Structured critique</b><span class="tagline">— assumption-level, beyond the flaw-level critique you already have</span></div>
+  <div class="grid">
+    <div class="card">
+      <div class="top"><span class="name">premortem</span><span class="pill p3">P3</span></div>
+      <p class="what">Assumes the plan already failed and enumerates the causes with likelihood/impact, then top mitigations. Prospective hindsight ≈ +30% at naming real reasons.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill sonnet">sonnet</span><span class="pill ro">read-only</span></div>
+      <div class="src">Klein, HBR 2007<sup><a href="#s13">[13]</a></sup></div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">assumption-surfacer</span><span class="pill p3">P3</span></div>
+      <p class="what">Toulmin-maps a claim or plan and lists the <i>implicit warrants</i> it silently depends on — the unstated "this only works if…" conditions.</p>
+      <div class="meta"><span class="pill agent">agent</span><span class="pill sonnet">sonnet</span><span class="pill ro">read-only</span></div>
+      <div class="src">Toulmin argument model<sup><a href="#s14">[14]</a></sup></div>
+    </div>
+    <div class="card">
+      <div class="top"><span class="name">/brainstorm pipeline</span><span class="pill p3">P3</span></div>
+      <p class="what">A skill that wires the loop: reframe (How-Might-We) → ideator (diversity-forced) → premortem + assumption-surfacer stress-test → synthesizer shortlist. The discipline, made one command.</p>
+      <div class="meta"><span class="pill skill">skill</span><span class="pill opus">opus</span></div>
+      <div class="src">Composes the agents above · optional method pack: six-hats, SCAMPER, first-principles, analogy-finder</div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Design principles</h2>
+  <div class="h2sub serif">Evidence-based, and a few of them are counterintuitive</div>
+  <div class="principles"><ul>
+    <li><b>Every verifier must rest on an external signal</b> — web retrieval, a corpus, code/test execution, or independent re-sampling. Pure "reconsider your answer" introspection <b>degrades</b> reasoning. <span class="ev">Huang 2023: CommonSenseQA collapsed 75.8% → 38.1% after one self-correction round</span><sup><a href="#s15">[15]</a></sup></li>
+    <li><b>Prefer voting over elaborate debate at matched cost.</b> Multi-agent debate is largely dressed-up majority voting and often loses to plain self-consistency. <span class="ev">Huang 2023: debate 83.0% vs self-consistency 88.2% at 9 responses</span> — so cap debate rounds at 2–3 and reach for <code>vote</code> when the answer is discrete.</li>
+    <li><b>Debias the judge.</b> LLM-as-judge has position, verbosity, and self-preference bias. Swap positions and average, use the strongest model as judge, and <b>never let a model judge its own output</b>. <span class="ev">Zheng 2023</span><sup><a href="#s16">[16]</a></sup></li>
+    <li><b>Force idea diversity by default.</b> LLM ideation homogenizes (different users converge on the same idea). Use random <i>ordinary</i> personas, over-generate then cluster. <span class="ev">Deng 2025: ordinary-persona + CoT beat human collective diversity by ~26%; celebrity personas cluster too densely</span></li>
+    <li><b>Spend multi-agent tokens only when it pays.</b> Multi-agent helps on broad, parallelizable, high-value tasks (~15× tokens); a single strong agent usually wins on tightly-coupled/coding work. <span class="ev">Anthropic 2025; MAST 2025: role-team ChatDev scored 25% with GPT-4o</span><sup><a href="#s17">[17]</a><a href="#s18">[18]</a></sup></li>
+  </ul></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>What we will not build</h2>
+  <div class="h2sub serif">Anti-bloat — already covered or evidence says skip</div>
+  <div class="nope">
+    <div><b>swarm / topology coordinators</b><br><span class="muted">ruflo + project agents already ship hierarchical/mesh/adaptive.</span></div>
+    <div><b>distributed consensus</b><br><span class="muted">byzantine / raft / gossip / quorum exist in the project agents — infra, not opinion panels.</span></div>
+    <div><b>more code-reviewers</b><br><span class="muted">review is saturated across toolkit + cc10x + ruflo.</span></div>
+    <div><b>role-team frameworks</b><br><span class="muted">CAMEL/MetaGPT-style teams underperform (MAST); council + orchestrate suffice.</span></div>
+    <div><b>naive self-refine loops</b><br><span class="muted">harmful without an external signal — see principles.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Rollout</h2>
+  <div class="h2sub serif">Three phases, smallest valuable slice first</div>
+  <div class="phase">
+    <div class="tag">Phase 1 — verification (your core ask)</div>
+    <h3 class="serif">cove-verifier · citation-auditor · consistency-checker</h3>
+    <p class="muted">Highest ROI and lowest risk: all read-only, all rest on external signals (repo, web, re-sampling). Directly attacks hallucination. Ships as 2 agents + 1 skill.</p>
+  </div>
+  <div class="phase">
+    <div class="tag">Phase 2 — loops &amp; ideation</div>
+    <h3 class="serif">refine-loop · debate · ideator · synthesizer</h3>
+    <p class="muted">Adds iteration, judged debate, and the divergent→convergent pair. <code>refine-loop</code> plugs straight into your existing <code>verify-result-claim</code> + SLURM test runs.</p>
+  </div>
+  <div class="phase">
+    <div class="tag">Phase 3 — structured critique &amp; the pipeline</div>
+    <h3 class="serif">premortem · assumption-surfacer · /brainstorm · vote</h3>
+    <p class="muted">Nice-to-have polish and the one-command brainstorm pipeline. Optional method pack (six-hats, SCAMPER, first-principles) if you want them.</p>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Sources</h2>
+  <div class="h2sub serif">Primary references (15)</div>
+  <table class="src-tbl">
+    <tr id="s1"><td>[1]</td><td>Dhuliawala et al. 2023 — <a href="https://arxiv.org/abs/2309.11495">Chain-of-Verification Reduces Hallucination</a> (arXiv:2309.11495)</td></tr>
+    <tr id="s2"><td>[2]</td><td>Manakul et al. 2023 — <a href="https://arxiv.org/abs/2303.08896">SelfCheckGPT</a> (arXiv:2303.08896, EMNLP 2023)</td></tr>
+    <tr id="s3"><td>[3]</td><td>Wang et al. 2022 — <a href="https://arxiv.org/abs/2203.11171">Self-Consistency Improves CoT</a> (arXiv:2203.11171)</td></tr>
+    <tr id="s4"><td>[4]</td><td>Gao et al. 2022 — <a href="https://arxiv.org/abs/2210.08726">RARR: Researching and Revising</a> (arXiv:2210.08726, ACL 2023)</td></tr>
+    <tr id="s5"><td>[5]</td><td>Rashkin et al. 2021 — <a href="https://arxiv.org/abs/2112.12870">Measuring Attribution (AIS)</a> (arXiv:2112.12870)</td></tr>
+    <tr id="s6"><td>[6]</td><td>Du et al. 2023 — <a href="https://arxiv.org/abs/2305.14325">Improving Factuality via Multiagent Debate</a> (arXiv:2305.14325)</td></tr>
+    <tr id="s7"><td>[7]</td><td>Liang et al. 2023 — <a href="https://arxiv.org/abs/2305.19118">Encouraging Divergent Thinking via Debate</a> (arXiv:2305.19118)</td></tr>
+    <tr id="s8"><td>[8]</td><td>Shinn et al. 2023 — <a href="https://arxiv.org/abs/2303.11366">Reflexion</a> (arXiv:2303.11366, NeurIPS 2023)</td></tr>
+    <tr id="s9"><td>[9]</td><td>Madaan et al. 2023 — <a href="https://arxiv.org/abs/2303.17651">Self-Refine</a> (arXiv:2303.17651)</td></tr>
+    <tr id="s10"><td>[10]</td><td>Guilford 1956/1967 — Structure of Intellect (divergent vs convergent thinking)</td></tr>
+    <tr id="s11"><td>[11]</td><td>Deng, Brucks, Toubia 2025 — Barriers to Diversity in LLM-Generated Ideas (arXiv)</td></tr>
+    <tr id="s12"><td>[12]</td><td>Anderson et al. 2024 — <a href="https://dl.acm.org/doi/10.1145/3635636.3656204">Homogenization Effects of LLMs on Creative Ideation</a> (C&amp;C 2024); Nature Human Behaviour 2025</td></tr>
+    <tr id="s13"><td>[13]</td><td>Klein 2007 — Performing a Project Premortem (Harvard Business Review)</td></tr>
+    <tr id="s14"><td>[14]</td><td>Toulmin — The Uses of Argument (claim / grounds / warrant model)</td></tr>
+    <tr id="s15"><td>[15]</td><td>Huang et al. 2023 — <a href="https://arxiv.org/abs/2310.01798">LLMs Cannot Self-Correct Reasoning Yet</a> (arXiv:2310.01798, ICLR 2024)</td></tr>
+    <tr id="s16"><td>[16]</td><td>Zheng et al. 2023 — <a href="https://arxiv.org/abs/2306.05685">Judging LLM-as-a-Judge (MT-Bench)</a> (arXiv:2306.05685)</td></tr>
+    <tr id="s17"><td>[17]</td><td>Anthropic 2025 — <a href="https://www.anthropic.com/engineering/multi-agent-research-system">How we built our multi-agent research system</a></td></tr>
+    <tr id="s18"><td>[18]</td><td>Cemri/Pan et al. 2025 — <a href="https://arxiv.org/abs/2503.13657">Why Do Multi-Agent LLM Systems Fail? (MAST)</a> (arXiv:2503.13657)</td></tr>
+  </table>
+  <p class="muted" style="font-size:13px;margin-top:14px">Honesty notes carried from the research: a few figures (SelfCheckGPT AUC-PR, MAST per-category decimals, the MetaGPT arXiv id, the Nature Human Behaviour full text behind a paywall) were repo/abstract/secondary-sourced rather than verified verbatim in the primary PDF — flagged so they're double-checked before any go into a thesis.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="cta">
+    <b>This is a plan, not an implementation.</b> Nothing above has been built. Tell me which buckets/phases to keep, what to cut, and whether the priorities are right — then I'll write the spec and we build Phase 1 first.
+  </div>
+  <p class="muted">claude-toolkit · agentic expansion proposal · Anthropic-themed · generated for review</p>
+</div></footer>
+
+</body>
+</html>

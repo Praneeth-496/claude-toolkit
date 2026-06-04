@@ -6,58 +6,58 @@
 <title>claude-toolkit · dashboard</title>
 <style>
   :root{
-    --bg:#0b0e14; --panel:#121723; --panel2:#171d2b; --line:#222a3a;
-    --ink:#e6edf3; --dim:#8b97a8; --accent:#7c9cff; --accent2:#5ce6c0;
-    --warn:#ffb454; --pink:#ff7eb6;
+    --bg:#F0EEE6; --panel:#FAF9F5; --panel2:#FFFFFF; --line:#E4E0D6; --line2:#D9D4C7;
+    --ink:#1A1A17; --dim:#6B6960; --accent:#CC785C; --accent2:#B05C3F;
+    --slate:#345E8B; --olive:#5F7A5A; --plum:#7A4A86;
   }
   *{box-sizing:border-box}
-  body{margin:0;font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
-    background:radial-gradient(1200px 600px at 80% -10%,#1a2236 0,var(--bg) 55%) fixed;color:var(--ink)}
-  a{color:var(--accent);text-decoration:none}
-  header.hero{padding:54px 24px 30px;max-width:1180px;margin:0 auto}
+  body{margin:0;font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,#F5F2EA 0,var(--bg) 320px) fixed;color:var(--ink);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2);text-decoration:none}
+  .serif,h1,h2,.stat b{font-family:Georgia,"Iowan Old Style","Times New Roman",Tiempos,serif}
+  header.hero{padding:56px 24px 28px;max-width:1180px;margin:0 auto}
   .logo{display:flex;align-items:center;gap:14px}
   .logo .mark{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;font-weight:800;color:#0b0e14;font-size:22px;box-shadow:0 8px 30px rgba(124,156,255,.35)}
-  h1{font-size:30px;margin:0;letter-spacing:-.5px}
+    display:grid;place-items:center;font-weight:800;color:#FBFAF7;font-size:21px;box-shadow:0 6px 22px rgba(204,120,92,.32)}
+  h1{font-size:31px;margin:0;letter-spacing:-.4px}
   .ver{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent2);
-    border:1px solid var(--line);padding:3px 9px;border-radius:999px;background:var(--panel)}
-  .tag{color:var(--dim);margin:10px 0 0;max-width:680px}
+    border:1px solid var(--line2);padding:3px 9px;border-radius:999px;background:#FBEEE7}
+  .tag{color:var(--dim);margin:12px 0 0;max-width:680px}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:26px 0 6px}
-  .stat{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
-    border-radius:16px;padding:18px 18px}
-  .stat b{display:block;font-size:30px;letter-spacing:-1px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 18px}
+  .stat b{display:block;font-size:30px;letter-spacing:-.5px}
   .stat span{color:var(--dim);font-size:13px}
-  .stat.s1 b{color:var(--accent)} .stat.s2 b{color:var(--accent2)}
-  .stat.s3 b{color:var(--warn)} .stat.s4 b{color:var(--pink)}
+  .stat.s1 b{color:var(--accent)} .stat.s2 b{color:var(--slate)}
+  .stat.s3 b{color:var(--olive)} .stat.s4 b{color:var(--plum)}
   .toolbar{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);
-    background:rgba(11,14,20,.7);border-bottom:1px solid var(--line)}
+    background:rgba(240,238,230,.82);border-bottom:1px solid var(--line)}
   .toolbar .inner{max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  #q{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  #q{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line2);color:var(--ink);
     padding:11px 14px;border-radius:12px;font-size:14px;outline:none}
   #q:focus{border-color:var(--accent)}
   .nav{display:flex;gap:8px;flex-wrap:wrap}
-  .nav a{font-size:13px;color:var(--dim);border:1px solid var(--line);padding:7px 11px;border-radius:10px;background:var(--panel)}
+  .nav a{font-size:13px;color:var(--dim);border:1px solid var(--line2);padding:7px 11px;border-radius:10px;background:var(--panel)}
   .nav a:hover{color:var(--ink);border-color:var(--accent)}
   main{max-width:1180px;margin:0 auto;padding:8px 24px 70px}
   section{margin:34px 0}
-  h2{font-size:18px;display:flex;align-items:center;gap:10px;margin:0 0 14px}
-  .count{font:600 12px ui-monospace,monospace;color:var(--dim);border:1px solid var(--line);
-    padding:2px 8px;border-radius:999px}
+  h2{font-size:20px;display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .count{font:600 12px ui-monospace,monospace;color:var(--dim);border:1px solid var(--line2);
+    padding:2px 8px;border-radius:999px;background:var(--panel)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
     transition:transform .12s,border-color .12s,box-shadow .12s}
-  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 24px rgba(60,50,40,.08)}
   .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .card h3{margin:0;font:600 15px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink)}
   .card .sub{color:var(--dim);font-size:12px;margin-top:2px}
-  .card p{margin:9px 0 0;color:#c6d0de;font-size:13.5px}
-  .pill{font:600 10px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
-  .pill.opus{color:var(--pink);border-color:#3a2433} .pill.sonnet{color:var(--accent);border-color:#23304d}
-  .pill.haiku{color:var(--accent2);border-color:#1d3b35}
+  .card p{margin:9px 0 0;color:#33312B;font-size:13.5px}
+  .pill{font:600 10px ui-monospace,monospace;padding:3px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--slate);background:#F4F1EA}
+  .pill.opus{color:var(--plum);border-color:#E3D3E8;background:#F8F1FA} .pill.sonnet{color:var(--slate);border-color:#D2DEEC;background:#EFF4FA}
+  .pill.haiku{color:var(--olive);border-color:#D2E0CE;background:#EFF5ED}
   .empty{display:none;color:var(--dim);padding:30px 0;text-align:center}
   footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;color:var(--dim);font-size:13px}
-  code{background:var(--panel2);border:1px solid var(--line);padding:2px 7px;border-radius:7px;
-    font:13px ui-monospace,monospace;color:var(--accent2)}
+  code{background:#EFEBE1;border:1px solid var(--line);padding:2px 7px;border-radius:7px;
+    font:13px ui-monospace,monospace;color:#7A4A2C}
   .no-match section{display:none}
 </style>
 </head>
@@ -66,13 +66,13 @@
   <div class="logo">
     <div class="mark">ct</div>
     <div>
-      <h1>claude-toolkit <span class="ver">v0.5.0</span></h1>
+      <h1>claude-toolkit <span class="ver">v0.6.0</span></h1>
     </div>
   </div>
   <p class="tag">Portable Claude Code workflow toolkit — skills, review agents, safety hooks, and a bundled zero-dependency MCP server. Install once, live in every project.</p>
   <div class="stats">
-    <div class="stat s1"><b>25</b><span>skills</span></div>
-    <div class="stat s2"><b>8</b><span>review agents</span></div>
+    <div class="stat s1"><b>30</b><span>skills</span></div>
+    <div class="stat s2"><b>14</b><span>review agents</span></div>
     <div class="stat s3"><b>4</b><span>active hooks</span></div>
     <div class="stat s4"><b>4</b><span>MCP tools</span></div>
   </div>
@@ -89,17 +89,32 @@
 <main>
   
   <section id="skills">
-    <h2>Workflow skills <span class="count">13</span></h2>
+    <h2>Workflow skills <span class="count">18</span></h2>
     <div class="grid">
   <article class="card" data-search="auto-memory bootstrap or refresh the project memory directory automatically by scanning the current repo. derives a project snapshot, a code-style snapshot, and a reference-paths snapshot from what's actually on disk — no user input required. run on a fresh project to seed memory; re-run any time to rebuild from current state.">
     <div class="card-head"><h3>auto-memory</h3><span class="pill opus">opus</span></div>
     
     <p>Bootstrap or refresh the project memory directory automatically by scanning the current repo. Derives a project snapshot, a code-style snapshot, and a reference-paths snapshot from what's actually on&hellip;</p>
   </article>
+  <article class="card" data-search="brainstorm end-to-end divergent-&gt;convergent ideation pipeline. reframes the problem, generates diverse options, stress-tests them, and converges to a recommended shortlist — wiring the ideator, premortem, assumption-surfacer, and synthesizer agents into one disciplined pass. use for &quot;help me brainstorm&quot;, &quot;explore options for x&quot;, &quot;what are our approaches and which is best&quot;. project-agnostic.">
+    <div class="card-head"><h3>brainstorm</h3><span class="pill opus">opus</span></div>
+    
+    <p>End-to-end divergent-&gt;convergent ideation pipeline. Reframes the problem, generates diverse options, stress-tests them, and converges to a recommended shortlist — wiring the ideator, premortem, assum&hellip;</p>
+  </article>
+  <article class="card" data-search="consistency-checker source-free hallucination triage (selfcheckgpt-style). re-generates an answer or claim several times independently and flags the sentences that change across samples — divergence is a strong hallucination signal, consistency is a weak confidence signal. use when you have no reference source to check against but want to know which parts to trust. trigger on &quot;is this made up?&quot;, &quot;how confident is this?&quot;, &quot;check this for hallucination&quot;.">
+    <div class="card-head"><h3>consistency-checker</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Source-free hallucination triage (SelfCheckGPT-style). Re-generates an answer or claim several times independently and flags the sentences that change across samples — divergence is a strong hallucin&hellip;</p>
+  </article>
   <article class="card" data-search="council convene a panel of 4 claude subagents (architect, reviewer, simplifier, adversary) on a single hard decision — architecture choice, security review, &quot;should we?&quot; questions. each gives an independent ≤300-word opinion in parallel; main thread synthesizes consensus and dissent. result is written to .claude/council/ for later audit. use only for high-stakes one-shot decisions, not daily code edits.">
     <div class="card-head"><h3>council</h3><span class="pill opus">opus</span></div>
     
     <p>Convene a panel of 4 Claude subagents (architect, reviewer, simplifier, adversary) on a single hard decision — architecture choice, security review, &quot;should we?&quot; questions. Each gives an independent &hellip;</p>
+  </article>
+  <article class="card" data-search="debate judged multi-round debate for contested-correctness questions where a single pass over-commits to its first answer. 2-3 independent agents answer, read each other's reasoning, and revise over a capped number of rounds; a separate judge declares consensus or the best-supported position. use for hard yes/no or &quot;is this correct?&quot; questions. trigger on &quot;is this actually safe/correct?&quot;, &quot;settle this&quot;, &quot;stress-test this conclusion&quot;.">
+    <div class="card-head"><h3>debate</h3><span class="pill opus">opus</span></div>
+    
+    <p>Judged multi-round debate for contested-correctness questions where a single pass over-commits to its first answer. 2-3 independent agents answer, read each other's reasoning, and revise over a cappe&hellip;</p>
   </article>
   <article class="card" data-search="env-bootstrap create a mandatory isolated environment for a project so package/module versions never collide with the system or other projects. uv-first for python (falls back to python -m venv), local node_modules for node. idempotent; never installs anything globally. trigger when starting work in a new repo, when the user says &quot;set up the environment&quot;, &quot;create a venv&quot;, &quot;isolate dependencies&quot;, or before any package install.">
     <div class="card-head"><h3>env-bootstrap</h3><span class="pill sonnet">sonnet</span></div>
@@ -125,6 +140,11 @@
     <div class="card-head"><h3>query-graph</h3><span class="pill haiku">haiku</span></div>
     
     <p>Cheap keyword + jq lookup over the project's knowledge graph (`graph/nodes.jsonl` + `graph/edges.jsonl`); returns matching nodes plus their 1-hop edges as a compact markdown subgraph. Token-light rec&hellip;</p>
+  </article>
+  <article class="card" data-search="refine-loop evaluator-optimizer loop gated on a real external signal. a generator produces a draft, an evaluator runs an actual check (tests, build, linter, a script, or a declared results source), writes a concrete critique, and the generator revises — repeating until the check passes or a cap is hit. use for work that has an objective pass/fail. trigger on &quot;make this pass the tests&quot;, &quot;iterate until it works&quot;, &quot;refine until correct&quot;.">
+    <div class="card-head"><h3>refine-loop</h3><span class="pill opus">opus</span></div>
+    
+    <p>Evaluator-optimizer loop gated on a REAL external signal. A generator produces a draft, an evaluator runs an actual check (tests, build, linter, a script, or a declared results source), writes a conc&hellip;</p>
   </article>
   <article class="card" data-search="refresh-memory re-derive the project's auto-memory snapshot from the current repo state. use when the memory file contradicts the code, or when asked to &quot;refresh memory&quot; / &quot;update memory&quot;.">
     <div class="card-head"><h3>refresh-memory</h3><span class="pill sonnet">sonnet</span></div>
@@ -155,6 +175,11 @@
     <div class="card-head"><h3>verify-result-claim</h3><span class="pill sonnet">sonnet</span></div>
     
     <p>Given a numeric claim (e.g. &quot;82.1% accuracy&quot;, &quot;0.559 MAE&quot;), confirm it matches a value in this project's authoritative results files (JSON/CSV). Refuses if no match. Reads the project's results glob &hellip;</p>
+  </article>
+  <article class="card" data-search="vote self-consistency wrapper for discrete-answer questions. samples the same question several times independently and returns the majority answer plus an agreement score (low agreement = low confidence). the cheapest reliability boost available, but only for questions with a small set of possible answers. trigger on &quot;which of these&quot;, classification, &quot;pick one of a/b/c&quot;, &quot;what's the most likely x&quot;.">
+    <div class="card-head"><h3>vote</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Self-consistency wrapper for DISCRETE-answer questions. Samples the same question several times independently and returns the majority answer plus an agreement score (low agreement = low confidence).&hellip;</p>
   </article></div>
   </section>
   
@@ -224,17 +249,32 @@
   </section>
   
   <section id="agents">
-    <h2>Review subagents <span class="count">8</span></h2>
+    <h2>Review subagents <span class="count">14</span></h2>
     <div class="grid">
   <article class="card" data-search="adversary steelmans the opposite of the proposed change. use before irreversible decisions or merging anything labelled &quot;obviously correct&quot;. read-only.">
     <div class="card-head"><h3>adversary</h3><span class="pill opus">opus</span></div>
     
     <p>Steelmans the opposite of the proposed change. Use before irreversible decisions or merging anything labelled &quot;obviously correct&quot;. Read-only.</p>
   </article>
+  <article class="card" data-search="assumption-surfacer surfaces the implicit assumptions a claim, plan, or design silently depends on, using the toulmin argument model. finds the unstated &quot;this only works if ___&quot; conditions that, if false, sink the conclusion. complements flaw-level critique (which attacks what is written) by exposing what is not written. use before betting on a plan or accepting an argument. read-only. project-agnostic.">
+    <div class="card-head"><h3>assumption-surfacer</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Surfaces the IMPLICIT assumptions a claim, plan, or design silently depends on, using the Toulmin argument model. Finds the unstated &quot;this only works if ___&quot; conditions that, if false, sink the concl&hellip;</p>
+  </article>
+  <article class="card" data-search="citation-auditor per-claim source-grounding auditor. for every factual sentence in a document, answer, or code comment, retrieves supporting evidence and labels it supported / unsupported / contradicted with a citation. catches invented papers, wrong dois, fabricated apis, and plausible-but-unsourced numbers. use on any text that asserts external facts or cites sources. read-only. project-agnostic.">
+    <div class="card-head"><h3>citation-auditor</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Per-claim source-grounding auditor. For every factual sentence in a document, answer, or code comment, retrieves supporting evidence and labels it Supported / Unsupported / Contradicted with a citati&hellip;</p>
+  </article>
   <article class="card" data-search="code-reviewer strict code reviewer. use after a meaningful diff exists (&gt;5 lines or &gt;1 file). reviews staged or recently-edited code for correctness, security (owasp), readability, and over-engineering. read-only.">
     <div class="card-head"><h3>code-reviewer</h3><span class="pill sonnet">sonnet</span></div>
     
     <p>Strict code reviewer. Use after a meaningful diff exists (&gt;5 lines or &gt;1 file). Reviews staged or recently-edited code for correctness, security (OWASP), readability, and over-engineering. Read-only.</p>
+  </article>
+  <article class="card" data-search="cove-verifier chain-of-verification fact checker. takes a claim, answer, or generated passage and reduces hallucination by generating independent verification questions, answering each in isolation (so the original wording can't bias the check), then flagging or revising anything the checks contradict. use on any high-stakes factual output before it is acted on. read-only. project-agnostic.">
+    <div class="card-head"><h3>cove-verifier</h3><span class="pill opus">opus</span></div>
+    
+    <p>Chain-of-Verification fact checker. Takes a claim, answer, or generated passage and reduces hallucination by generating independent verification questions, answering each in ISOLATION (so the origina&hellip;</p>
   </article>
   <article class="card" data-search="doc-writer updates docstrings, readme sections, and changelog entries to match a code change. touches docs files only — never source code.">
     <div class="card-head"><h3>doc-writer</h3><span class="pill sonnet">sonnet</span></div>
@@ -251,6 +291,16 @@
     
     <p>Audits a *chain* of agent outputs (or a single agent's reasoning trace) for unsupported leaps, contradictions with prior tool outputs, and conclusions that do not follow from the evidence cited. Use &hellip;</p>
   </article>
+  <article class="card" data-search="ideator divergent idea generator tuned for diversity, not just quality. produces many genuinely different options for a problem, design, name, or approach, using diversity-forcing techniques so the ideas don't collapse to the obvious cluster. pure generation, no self-judging. pair with the synthesizer agent to converge. use for brainstorming, naming, design exploration, &quot;what are our options&quot;. read-only. project-agnostic.">
+    <div class="card-head"><h3>ideator</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Divergent idea generator tuned for DIVERSITY, not just quality. Produces many genuinely different options for a problem, design, name, or approach, using diversity-forcing techniques so the ideas don&hellip;</p>
+  </article>
+  <article class="card" data-search="premortem prospective-hindsight risk finder. assumes the plan, design, or change has already failed, then works backward to enumerate the causes, their likelihood and impact, and the highest-leverage mitigations. surfaces failure modes that optimism hides. use before committing to a plan or merging a risky change. read-only. project-agnostic.">
+    <div class="card-head"><h3>premortem</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Prospective-hindsight risk finder. Assumes the plan, design, or change has ALREADY failed, then works backward to enumerate the causes, their likelihood and impact, and the highest-leverage mitigatio&hellip;</p>
+  </article>
   <article class="card" data-search="security-auditor security-focused review of changed code. use before merging anything that touches auth, secrets, file i/o, network calls, deserialization, or shell exec. read-only.">
     <div class="card-head"><h3>security-auditor</h3><span class="pill sonnet">sonnet</span></div>
     
@@ -260,6 +310,11 @@
     <div class="card-head"><h3>simplifier</h3><span class="pill sonnet">sonnet</span></div>
     
     <p>Finds dead code, over-abstractions, unused exports, and premature generalisation in the changed files. Read-only.</p>
+  </article>
+  <article class="card" data-search="synthesizer convergent closer for a set of ideas or options. clusters many raw ideas, scores them against explicit criteria, and recommends a shortlist with rationale and trade-offs. the second half of divergent-&gt;convergent; pairs with the ideator agent or the council/orchestrate skills. use to turn a long brainstorm into a decision. read-only. project-agnostic.">
+    <div class="card-head"><h3>synthesizer</h3><span class="pill opus">opus</span></div>
+    
+    <p>Convergent closer for a set of ideas or options. Clusters many raw ideas, scores them against explicit criteria, and recommends a shortlist with rationale and trade-offs. The second half of divergent&hellip;</p>
   </article>
   <article class="card" data-search="test-runner runs the project's tests, summarises failures, suggests minimal fixes. use after any code change before commit. has bash + read access.">
     <div class="card-head"><h3>test-runner</h3><span class="pill sonnet">sonnet</span></div>
