@@ -48,6 +48,12 @@ Current status:
 - Artefacts: <ARTEFACT_FILE_TYPES>  (e.g. .joblib classical, .pt NN, .npz sequences, .json splits/results)
 - Shell scripts: <SHELL_SCRIPT_PATTERN>  (e.g. run_<verb>_<scope>.sh)
 
+## Environment isolation (mandatory)
+- **Never install packages globally.** Every project works inside its own isolated env so versions never collide across projects or with the system.
+- Python: a project-local `.venv` (created with `uv venv`, or `python -m venv .venv`). Install with `uv pip install ...` or after `source .venv/bin/activate`. Never bare `pip install`, `sudo pip`, or `pip install --user`.
+- Node: local `node_modules` only (`npm install`), never `npm install -g`.
+- First step in a fresh repo: run the `env-bootstrap` skill. The `block-global-pip` hook will refuse global installs until an isolated env is active.
+
 ## Auto-memory caveat
 - `~/.claude/projects/<AUTO_MEMORY_DIR>/memory/` may go stale over time
 - Trust current code over memory; run the `refresh-memory` skill to re-derive

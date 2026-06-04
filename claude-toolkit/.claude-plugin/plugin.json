@@ -1,7 +1,7 @@
 {
   "name": "claude-toolkit",
-  "description": "Portable Claude Code context, skills, hooks, and guard rails. File-based memory, council orchestration, numeric-claim verification, HPC/SLURM helpers, and devcontainer-ready security.",
-  "version": "0.4.1",
+  "description": "Portable Claude Code context, 24 skills, 8 review agents, safety hooks, a /toolkit-init bootstrap command, and a bundled zero-dependency MCP server (verify_result_claim, query_graph, memory_graph_add, placeholder_scan). File-based + graph memory, council orchestration, numeric-claim verification, HPC/SLURM helpers, devcontainer-ready security.",
+  "version": "0.5.0",
   "author": {
     "name": "Praneeth Dathu",
     "url": "https://github.com/Praneeth-496"

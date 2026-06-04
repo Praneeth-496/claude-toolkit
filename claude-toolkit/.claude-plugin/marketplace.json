@@ -9,7 +9,7 @@
       "name": "claude-toolkit",
       "source": "github:Praneeth-496/claude-toolkit",
       "path": "claude-toolkit",
-      "description": "Portable Claude Code context, skills, hooks, and guard rails. Includes file-based memory (auto-memory, refresh-memory, memory-graph), council orchestration, numeric-claim verification, sync-rsync, submit-slurm, and run-pipeline."
+      "description": "Portable Claude Code context, 24 skills, 8 review agents, safety hooks, /toolkit-init, and a bundled zero-dependency MCP server. File-based + graph memory (auto-memory, refresh-memory, memory-graph, query-graph), council orchestration, numeric-claim verification, sync-rsync, submit-slurm, run-pipeline."
     }
   ]
 }

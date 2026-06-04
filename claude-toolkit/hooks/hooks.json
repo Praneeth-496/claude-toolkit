@@ -1,0 +1,49 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/templates/hooks/block-dangerous-bash.sh\"",
+            "timeout": 10,
+            "statusMessage": "toolkit: dangerous-command guard"
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/templates/hooks/block-global-pip.sh\"",
+            "timeout": 10,
+            "statusMessage": "toolkit: env-isolation guard"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/templates/hooks/format-on-write.sh\"",
+            "timeout": 30,
+            "statusMessage": "toolkit: format-on-write"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/templates/hooks/session-briefing.sh\"",
+            "timeout": 10,
+            "statusMessage": "toolkit: git session briefing"
+          }
+        ]
+      }
+    ]
+  }
+}

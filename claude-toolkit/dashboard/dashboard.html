@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>claude-toolkit · dashboard</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121723; --panel2:#171d2b; --line:#222a3a;
+    --ink:#e6edf3; --dim:#8b97a8; --accent:#7c9cff; --accent2:#5ce6c0;
+    --warn:#ffb454; --pink:#ff7eb6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#1a2236 0,var(--bg) 55%) fixed;color:var(--ink)}
+  a{color:var(--accent);text-decoration:none}
+  header.hero{padding:54px 24px 30px;max-width:1180px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:14px}
+  .logo .mark{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-weight:800;color:#0b0e14;font-size:22px;box-shadow:0 8px 30px rgba(124,156,255,.35)}
+  h1{font-size:30px;margin:0;letter-spacing:-.5px}
+  .ver{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent2);
+    border:1px solid var(--line);padding:3px 9px;border-radius:999px;background:var(--panel)}
+  .tag{color:var(--dim);margin:10px 0 0;max-width:680px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:26px 0 6px}
+  .stat{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:16px;padding:18px 18px}
+  .stat b{display:block;font-size:30px;letter-spacing:-1px}
+  .stat span{color:var(--dim);font-size:13px}
+  .stat.s1 b{color:var(--accent)} .stat.s2 b{color:var(--accent2)}
+  .stat.s3 b{color:var(--warn)} .stat.s4 b{color:var(--pink)}
+  .toolbar{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);
+    background:rgba(11,14,20,.7);border-bottom:1px solid var(--line)}
+  .toolbar .inner{max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  #q{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:11px 14px;border-radius:12px;font-size:14px;outline:none}
+  #q:focus{border-color:var(--accent)}
+  .nav{display:flex;gap:8px;flex-wrap:wrap}
+  .nav a{font-size:13px;color:var(--dim);border:1px solid var(--line);padding:7px 11px;border-radius:10px;background:var(--panel)}
+  .nav a:hover{color:var(--ink);border-color:var(--accent)}
+  main{max-width:1180px;margin:0 auto;padding:8px 24px 70px}
+  section{margin:34px 0}
+  h2{font-size:18px;display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .count{font:600 12px ui-monospace,monospace;color:var(--dim);border:1px solid var(--line);
+    padding:2px 8px;border-radius:999px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;
+    transition:transform .12s,border-color .12s,box-shadow .12s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .card h3{margin:0;font:600 15px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink)}
+  .card .sub{color:var(--dim);font-size:12px;margin-top:2px}
+  .card p{margin:9px 0 0;color:#c6d0de;font-size:13.5px}
+  .pill{font:600 10px ui-monospace,monospace;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+  .pill.opus{color:var(--pink);border-color:#3a2433} .pill.sonnet{color:var(--accent);border-color:#23304d}
+  .pill.haiku{color:var(--accent2);border-color:#1d3b35}
+  .empty{display:none;color:var(--dim);padding:30px 0;text-align:center}
+  footer{max-width:1180px;margin:0 auto;padding:0 24px 60px;color:var(--dim);font-size:13px}
+  code{background:var(--panel2);border:1px solid var(--line);padding:2px 7px;border-radius:7px;
+    font:13px ui-monospace,monospace;color:var(--accent2)}
+  .no-match section{display:none}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="logo">
+    <div class="mark">ct</div>
+    <div>
+      <h1>claude-toolkit <span class="ver">v0.5.0</span></h1>
+    </div>
+  </div>
+  <p class="tag">Portable Claude Code workflow toolkit — skills, review agents, safety hooks, and a bundled zero-dependency MCP server. Install once, live in every project.</p>
+  <div class="stats">
+    <div class="stat s1"><b>25</b><span>skills</span></div>
+    <div class="stat s2"><b>8</b><span>review agents</span></div>
+    <div class="stat s3"><b>4</b><span>active hooks</span></div>
+    <div class="stat s4"><b>4</b><span>MCP tools</span></div>
+  </div>
+</header>
+
+<div class="toolbar"><div class="inner">
+  <input id="q" type="search" placeholder="Filter everything…  (try: memory, slurm, review, pip)" autofocus>
+  <nav class="nav">
+    <a href="#skills">Skills</a><a href="#agents">Agents</a><a href="#mcp">MCP</a>
+    <a href="#hooks">Hooks</a><a href="#commands">Commands</a>
+  </nav>
+</div></div>
+
+<main>
+  
+  <section id="skills">
+    <h2>Workflow skills <span class="count">13</span></h2>
+    <div class="grid">
+  <article class="card" data-search="auto-memory bootstrap or refresh the project memory directory automatically by scanning the current repo. derives a project snapshot, a code-style snapshot, and a reference-paths snapshot from what's actually on disk — no user input required. run on a fresh project to seed memory; re-run any time to rebuild from current state.">
+    <div class="card-head"><h3>auto-memory</h3><span class="pill opus">opus</span></div>
+    
+    <p>Bootstrap or refresh the project memory directory automatically by scanning the current repo. Derives a project snapshot, a code-style snapshot, and a reference-paths snapshot from what's actually on&hellip;</p>
+  </article>
+  <article class="card" data-search="council convene a panel of 4 claude subagents (architect, reviewer, simplifier, adversary) on a single hard decision — architecture choice, security review, &quot;should we?&quot; questions. each gives an independent ≤300-word opinion in parallel; main thread synthesizes consensus and dissent. result is written to .claude/council/ for later audit. use only for high-stakes one-shot decisions, not daily code edits.">
+    <div class="card-head"><h3>council</h3><span class="pill opus">opus</span></div>
+    
+    <p>Convene a panel of 4 Claude subagents (architect, reviewer, simplifier, adversary) on a single hard decision — architecture choice, security review, &quot;should we?&quot; questions. Each gives an independent &hellip;</p>
+  </article>
+  <article class="card" data-search="env-bootstrap create a mandatory isolated environment for a project so package/module versions never collide with the system or other projects. uv-first for python (falls back to python -m venv), local node_modules for node. idempotent; never installs anything globally. trigger when starting work in a new repo, when the user says &quot;set up the environment&quot;, &quot;create a venv&quot;, &quot;isolate dependencies&quot;, or before any package install.">
+    <div class="card-head"><h3>env-bootstrap</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Create a mandatory isolated environment for a project so package/module versions never collide with the system or other projects. uv-first for Python (falls back to python -m venv), local node_module&hellip;</p>
+  </article>
+  <article class="card" data-search="memory-graph build or extend a graphiti-style knowledge graph (nodes + edges as jsonl) under the project's memory directory. captures files, modules, concepts, decisions, and their relationships so future sessions can recall a 1-hop subgraph instead of re-reading flat memory snapshots. modes; build (first run), add (incremental), rebuild (destructive). project-agnostic; works on any git repo. trigger when user says &quot;build memory graph&quot;, &quot;graph this project&quot;, &quot;graphiti memory&quot;, &quot;memory graph&quot;, or states a durable relationship worth remembering (&quot;x depends on y&quot;, &quot;we superseded z with w&quot;, &quot;remember that a owns b&quot;, &quot;decision: ...&quot;). also auto-trigger after `auto-memory` finishes on a project with ≥30 source files where no `graph/` directory exists yet — propose it before suggesting more flat snapshots.">
+    <div class="card-head"><h3>memory-graph</h3><span class="pill opus">opus</span></div>
+    
+    <p>Build or extend a Graphiti-style knowledge graph (nodes + edges as JSONL) under the project's memory directory. Captures files, modules, concepts, decisions, and their relationships so future session&hellip;</p>
+  </article>
+  <article class="card" data-search="orchestrate operator/orchestrator pattern. decomposes a task into subtasks, picks the right specialist agent for each (code-reviewer, security-auditor, test-runner, simplifier, doc-writer, adversary), dispatches them in parallel where independent and sequential where dependent, then synthesizes one final result. use when a task has 3+ distinct concerns (e.g. &quot;review + test + update docs&quot; or &quot;audit security + check perf + write changelog&quot;).">
+    <div class="card-head"><h3>orchestrate</h3><span class="pill opus">opus</span></div>
+    
+    <p>Operator/orchestrator pattern. Decomposes a task into subtasks, picks the right specialist agent for each (code-reviewer, security-auditor, test-runner, simplifier, doc-writer, adversary), dispatches&hellip;</p>
+  </article>
+  <article class="card" data-search="pr-prep prepares a clean pr. stages changes, runs tests via test-runner agent, runs security-auditor on diff, drafts pr title + body in the project's house style. stops before push. use when about to open a pr or before committing a feature branch.">
+    <div class="card-head"><h3>pr-prep</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Prepares a clean PR. Stages changes, runs tests via test-runner agent, runs security-auditor on diff, drafts PR title + body in the project's house style. STOPS before push. Use when about to open a &hellip;</p>
+  </article>
+  <article class="card" data-search="query-graph cheap keyword + jq lookup over the project's knowledge graph (`graph/nodes.jsonl` + `graph/edges.jsonl`); returns matching nodes plus their 1-hop edges as a compact markdown subgraph. token-light recall layer — use this instead of re-reading flat memory snapshots whenever the question is about a specific file/concept/decision and a graph already exists for the project. trigger when user asks &quot;what depends on x&quot;, &quot;what uses x&quot;, &quot;who decided x&quot;, &quot;what was superseded&quot;, &quot;show me the x subgraph&quot;, &quot;graph lookup&quot;, or any recall question that names a single entity. auto-prefer this skill over reading project_*.md files when `graph/nodes.jsonl` exists in the project memory directory.">
+    <div class="card-head"><h3>query-graph</h3><span class="pill haiku">haiku</span></div>
+    
+    <p>Cheap keyword + jq lookup over the project's knowledge graph (`graph/nodes.jsonl` + `graph/edges.jsonl`); returns matching nodes plus their 1-hop edges as a compact markdown subgraph. Token-light rec&hellip;</p>
+  </article>
+  <article class="card" data-search="refresh-memory re-derive the project's auto-memory snapshot from the current repo state. use when the memory file contradicts the code, or when asked to &quot;refresh memory&quot; / &quot;update memory&quot;.">
+    <div class="card-head"><h3>refresh-memory</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Re-derive the project's auto-memory snapshot from the current repo state. Use when the memory file contradicts the code, or when asked to &quot;refresh memory&quot; / &quot;update memory&quot;.</p>
+  </article>
+  <article class="card" data-search="run-pipeline orchestrate a sequence of shell scripts as chained slurm jobs with --dependency=afterok, or sequentially as bash locally. uses submit-slurm for partition selection on each step.">
+    <div class="card-head"><h3>run-pipeline</h3><span class="pill opus">opus</span></div>
+    
+    <p>Orchestrate a sequence of shell scripts as chained SLURM jobs with --dependency=afterok, or sequentially as bash locally. Uses submit-slurm for partition selection on each step.</p>
+  </article>
+  <article class="card" data-search="session-watchdog background bash daemon that polls claude code's transcript jsonl files, sums token usage over the rolling rate-limit window, and at 90% triggers (a) a checkpoint of current task state to .claude/checkpoints/ and (b) a scheduled `claude --resume` for after the window rolls. project-agnostic; pure bash + jq, optional `at`. trigger when user says &quot;watchdog&quot;, &quot;auto-resume&quot;, &quot;session timeout&quot;, &quot;rate-limit handling&quot;, &quot;checkpoint and resume&quot;, &quot;monitor token usage&quot;, or starts a long autonomous task that may exceed a single 5-hour window.">
+    <div class="card-head"><h3>session-watchdog</h3><span class="pill haiku">haiku</span></div>
+    
+    <p>Background bash daemon that polls Claude Code's transcript JSONL files, sums token usage over the rolling rate-limit window, and at 90% triggers (a) a checkpoint of current task state to .claude/chec&hellip;</p>
+  </article>
+  <article class="card" data-search="submit-slurm submit an sbatch job to any slurm cluster. picks the freest partition whose gpu/cpu/time limits match the script's #sbatch directives. never auto-submits — prints the chosen partition and the sbatch command for user confirmation.">
+    <div class="card-head"><h3>submit-slurm</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Submit an sbatch job to any SLURM cluster. Picks the freest partition whose GPU/CPU/time limits match the script's #SBATCH directives. Never auto-submits — prints the chosen partition and the sbatch &hellip;</p>
+  </article>
+  <article class="card" data-search="sync-rsync rsync the local project to a remote host (hpc cluster, dev server). dry-run first, confirm before real push. reads remote host/path from .claude/claude.md.">
+    <div class="card-head"><h3>sync-rsync</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Rsync the local project to a remote host (HPC cluster, dev server). Dry-run first, confirm before real push. Reads remote host/path from .claude/CLAUDE.md.</p>
+  </article>
+  <article class="card" data-search="verify-result-claim given a numeric claim (e.g. &quot;82.1% accuracy&quot;, &quot;0.559 mae&quot;), confirm it matches a value in this project's authoritative results files (json/csv). refuses if no match. reads the project's results glob from .claude/claude.md (architecture section) or from an explicit user hint.">
+    <div class="card-head"><h3>verify-result-claim</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Given a numeric claim (e.g. &quot;82.1% accuracy&quot;, &quot;0.559 MAE&quot;), confirm it matches a value in this project's authoritative results files (JSON/CSV). Refuses if no match. Reads the project's results glob &hellip;</p>
+  </article></div>
+  </section>
+  
+  <section id="thinking">
+    <h2>Thinking / style skills <span class="count">12</span></h2>
+    <div class="grid">
+  <article class="card" data-search="10x rewrite text to be dramatically sharper — tighter, more vivid, more memorable. trigger when user says &quot;make this sharper&quot;, &quot;tighten this&quot;, &quot;rewrite better&quot;, &quot;make it punchier&quot;, &quot;improve this paragraph&quot;, &quot;this is too wordy&quot;, or pastes prose/commit-msg/pr-text and asks for a better version. for thesis paragraphs, abstracts, copy, commit messages.">
+    <div class="card-head"><h3>10x</h3></div>
+    
+    <p>Rewrite text to be dramatically sharper — tighter, more vivid, more memorable. TRIGGER when user says &quot;make this sharper&quot;, &quot;tighten this&quot;, &quot;rewrite better&quot;, &quot;make it punchier&quot;, &quot;improve this paragrap&hellip;</p>
+  </article>
+  <article class="card" data-search="brief one-sentence-or-paragraph answer, zero preamble. trigger when user says &quot;in one line&quot;, &quot;one sentence&quot;, &quot;tl;dr&quot;, &quot;short answer&quot;, &quot;quick&quot;, &quot;just the answer&quot;, &quot;don't explain&quot;, or the question is a factual lookup that doesn't need elaboration. style change — apply for one turn.">
+    <div class="card-head"><h3>brief</h3></div>
+    
+    <p>One-sentence-or-paragraph answer, zero preamble. TRIGGER when user says &quot;in one line&quot;, &quot;one sentence&quot;, &quot;TL;DR&quot;, &quot;short answer&quot;, &quot;quick&quot;, &quot;just the answer&quot;, &quot;don't explain&quot;, or the question is a factu&hellip;</p>
+  </article>
+  <article class="card" data-search="compare side-by-side comparison table + verdict. trigger when user says &quot;x vs y&quot;, &quot;compare a and b&quot;, &quot;which should i use&quot;, &quot;should i pick x or y&quot;, &quot;what's better, a or b&quot;, or names two-or-more concrete alternatives (libraries, models, approaches, file structures, designs) and asks to choose.">
+    <div class="card-head"><h3>compare</h3></div>
+    
+    <p>Side-by-side comparison table + verdict. TRIGGER when user says &quot;X vs Y&quot;, &quot;compare A and B&quot;, &quot;which should I use&quot;, &quot;should I pick X or Y&quot;, &quot;what's better, A or B&quot;, or names two-or-more concrete alter&hellip;</p>
+  </article>
+  <article class="card" data-search="critique harsh critical review — finds faults in code, prose, or a plan. trigger when user says &quot;critique this&quot;, &quot;review this&quot;, &quot;find faults&quot;, &quot;tear this apart&quot;, &quot;be harsh&quot;, &quot;what's wrong with this&quot;, &quot;is this any good&quot;, or pastes work and asks for honest feedback. stronger than a normal review — assumes user wants the unflattering version.">
+    <div class="card-head"><h3>critique</h3></div>
+    
+    <p>Harsh critical review — finds faults in code, prose, or a plan. TRIGGER when user says &quot;critique this&quot;, &quot;review this&quot;, &quot;find faults&quot;, &quot;tear this apart&quot;, &quot;be harsh&quot;, &quot;what's wrong with this&quot;, &quot;is this&hellip;</p>
+  </article>
+  <article class="card" data-search="devil steelman the opposing view. construct the strongest possible case against a position. trigger when user says &quot;argue against this&quot;, &quot;what's the counter-argument&quot;, &quot;steelman&quot;, &quot;play devil's advocate&quot;, &quot;stress-test this idea&quot;, &quot;convince me i'm wrong&quot;, or asks for the opposing view on a decision they've stated.">
+    <div class="card-head"><h3>devil</h3></div>
+    
+    <p>Steelman the opposing view. Construct the strongest possible case AGAINST a position. TRIGGER when user says &quot;argue against this&quot;, &quot;what's the counter-argument&quot;, &quot;steelman&quot;, &quot;play devil's advocate&quot;, &hellip;</p>
+  </article>
+  <article class="card" data-search="explainlikeim5 simple, jargon-free explanation with one analogy. trigger when user says &quot;explain like i'm 5&quot;, &quot;eli5&quot;, &quot;explain simply&quot;, &quot;in plain english&quot;, &quot;i don't understand x&quot;, &quot;explain to a non-technical person/pm/my mom&quot;, &quot;what does x actually mean&quot;, or asks to truly understand a concept rather than just look it up.">
+    <div class="card-head"><h3>explainlikeim5</h3></div>
+    
+    <p>Simple, jargon-free explanation with one analogy. TRIGGER when user says &quot;explain like I'm 5&quot;, &quot;ELI5&quot;, &quot;explain simply&quot;, &quot;in plain English&quot;, &quot;I don't understand X&quot;, &quot;explain to a non-technical person&hellip;</p>
+  </article>
+  <article class="card" data-search="godmode drop hedging, commit to a single recommendation, max density. trigger when user says &quot;just tell me&quot;, &quot;stop hedging&quot;, &quot;give me a real answer&quot;, &quot;what would you do&quot;, &quot;no bullshit&quot;, &quot;be direct&quot;, &quot;pick one&quot;, or expresses frustration at wishy-washy &quot;it depends&quot; responses. style change — invoke explicitly for one turn, do not auto-trigger on routine asks.">
+    <div class="card-head"><h3>godmode</h3></div>
+    
+    <p>Drop hedging, commit to a single recommendation, max density. TRIGGER when user says &quot;just tell me&quot;, &quot;stop hedging&quot;, &quot;give me a real answer&quot;, &quot;what would YOU do&quot;, &quot;no bullshit&quot;, &quot;be direct&quot;, &quot;pick on&hellip;</p>
+  </article>
+  <article class="card" data-search="humanizer |">
+    <div class="card-head"><h3>humanizer</h3></div>
+    
+    <p>|</p>
+  </article>
+  <article class="card" data-search="ooda structured observe→orient→decide→act for hard bugs and complex problems. trigger when user says &quot;i'm stuck&quot;, &quot;this bug doesn't make sense&quot;, &quot;i've tried everything&quot;, &quot;weird behavior&quot;, &quot;intermittent failure&quot;, &quot;race condition&quot;, &quot;the easy fix didn't work&quot;, or describes a problem where naive pattern-matching has already failed. forces explicit observation before guessing.">
+    <div class="card-head"><h3>ooda</h3></div>
+    
+    <p>Structured Observe→Orient→Decide→Act for hard bugs and complex problems. TRIGGER when user says &quot;I'm stuck&quot;, &quot;this bug doesn't make sense&quot;, &quot;I've tried everything&quot;, &quot;weird behavior&quot;, &quot;intermittent fa&hellip;</p>
+  </article>
+  <article class="card" data-search="pitch 30-second spoken pitch (~75 words). trigger when user says &quot;elevator pitch&quot;, &quot;pitch this&quot;, &quot;30 seconds&quot;, &quot;summarize for my supervisor/committee/investor&quot;, &quot;how would i introduce this in a defense&quot;, or asks for a quick spoken summary of the project/topic for a non-specialist audience.">
+    <div class="card-head"><h3>pitch</h3></div>
+    
+    <p>30-second spoken pitch (~75 words). TRIGGER when user says &quot;elevator pitch&quot;, &quot;pitch this&quot;, &quot;30 seconds&quot;, &quot;summarize for my supervisor/committee/investor&quot;, &quot;how would I introduce this in a defense&quot;, o&hellip;</p>
+  </article>
+  <article class="card" data-search="scout find risks, blind spots, failure modes — prioritized by severity. trigger when user says &quot;what could go wrong&quot;, &quot;find blind spots&quot;, &quot;risks of this approach&quot;, &quot;what am i missing&quot;, &quot;stress-test this plan&quot;, &quot;is this safe to ship&quot;, &quot;what could break&quot;, before merging a pr, or before an irreversible decision.">
+    <div class="card-head"><h3>scout</h3></div>
+    
+    <p>Find risks, blind spots, failure modes — prioritized by severity. TRIGGER when user says &quot;what could go wrong&quot;, &quot;find blind spots&quot;, &quot;risks of this approach&quot;, &quot;what am I missing&quot;, &quot;stress-test this pl&hellip;</p>
+  </article>
+  <article class="card" data-search="teacher socratic mentor mode — leads with questions instead of answers. trigger when user says &quot;teach me&quot;, &quot;i want to understand&quot;, &quot;help me learn&quot;, &quot;walk me through it so i get it&quot;, &quot;i want to actually grasp this not just copy&quot;, &quot;tutor me on x&quot;, or is preparing for a defense/exam where they need to internalize the material, not just be unblocked.">
+    <div class="card-head"><h3>teacher</h3></div>
+    
+    <p>Socratic mentor mode — leads with questions instead of answers. TRIGGER when user says &quot;teach me&quot;, &quot;I want to understand&quot;, &quot;help me learn&quot;, &quot;walk me through it so I get it&quot;, &quot;I want to actually grasp&hellip;</p>
+  </article></div>
+  </section>
+  
+  <section id="agents">
+    <h2>Review subagents <span class="count">8</span></h2>
+    <div class="grid">
+  <article class="card" data-search="adversary steelmans the opposite of the proposed change. use before irreversible decisions or merging anything labelled &quot;obviously correct&quot;. read-only.">
+    <div class="card-head"><h3>adversary</h3><span class="pill opus">opus</span></div>
+    
+    <p>Steelmans the opposite of the proposed change. Use before irreversible decisions or merging anything labelled &quot;obviously correct&quot;. Read-only.</p>
+  </article>
+  <article class="card" data-search="code-reviewer strict code reviewer. use after a meaningful diff exists (&gt;5 lines or &gt;1 file). reviews staged or recently-edited code for correctness, security (owasp), readability, and over-engineering. read-only.">
+    <div class="card-head"><h3>code-reviewer</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Strict code reviewer. Use after a meaningful diff exists (&gt;5 lines or &gt;1 file). Reviews staged or recently-edited code for correctness, security (OWASP), readability, and over-engineering. Read-only.</p>
+  </article>
+  <article class="card" data-search="doc-writer updates docstrings, readme sections, and changelog entries to match a code change. touches docs files only — never source code.">
+    <div class="card-head"><h3>doc-writer</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Updates docstrings, README sections, and CHANGELOG entries to match a code change. Touches docs files only — never source code.</p>
+  </article>
+  <article class="card" data-search="fact-checker verifies that factual claims in another agent's output (or in any text the user supplies) are grounded in the real repo. catches hallucinated file paths, symbol names, line numbers, numeric results, api signatures, commit hashes, and citations. use after any agent produces a deliverable that will be acted on. read-only.">
+    <div class="card-head"><h3>fact-checker</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Verifies that factual claims in another agent's output (or in any text the user supplies) are grounded in the real repo. Catches hallucinated file paths, symbol names, line numbers, numeric results, &hellip;</p>
+  </article>
+  <article class="card" data-search="flow-auditor audits a *chain* of agent outputs (or a single agent's reasoning trace) for unsupported leaps, contradictions with prior tool outputs, and conclusions that do not follow from the evidence cited. use after orchestrate, council, or any multi-step agent pipeline before acting on the synthesis. complements fact-checker — fact-checker verifies individual claims, flow-auditor verifies that the reasoning *between* claims holds. read-only.">
+    <div class="card-head"><h3>flow-auditor</h3><span class="pill opus">opus</span></div>
+    
+    <p>Audits a *chain* of agent outputs (or a single agent's reasoning trace) for unsupported leaps, contradictions with prior tool outputs, and conclusions that do not follow from the evidence cited. Use &hellip;</p>
+  </article>
+  <article class="card" data-search="security-auditor security-focused review of changed code. use before merging anything that touches auth, secrets, file i/o, network calls, deserialization, or shell exec. read-only.">
+    <div class="card-head"><h3>security-auditor</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Security-focused review of changed code. Use before merging anything that touches auth, secrets, file I/O, network calls, deserialization, or shell exec. Read-only.</p>
+  </article>
+  <article class="card" data-search="simplifier finds dead code, over-abstractions, unused exports, and premature generalisation in the changed files. read-only.">
+    <div class="card-head"><h3>simplifier</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Finds dead code, over-abstractions, unused exports, and premature generalisation in the changed files. Read-only.</p>
+  </article>
+  <article class="card" data-search="test-runner runs the project's tests, summarises failures, suggests minimal fixes. use after any code change before commit. has bash + read access.">
+    <div class="card-head"><h3>test-runner</h3><span class="pill sonnet">sonnet</span></div>
+    
+    <p>Runs the project's tests, summarises failures, suggests minimal fixes. Use after any code change before commit. Has Bash + Read access.</p>
+  </article></div>
+  </section>
+  
+  <section id="mcp">
+    <h2>MCP tools (bundled server) <span class="count">4</span></h2>
+    <div class="grid">
+  <article class="card" data-search="verify_result_claim confirm a number appears in a project's results files (json/csv/txt). refuses if absent.">
+    <div class="card-head"><h3>verify_result_claim</h3><span class="pill sonnet">tool</span></div>
+    <div class="sub">callable via /mcp</div>
+    <p>Confirm a number appears in a project's results files (JSON/CSV/TXT). Refuses if absent.</p>
+  </article>
+  <article class="card" data-search="query_graph 1-hop subgraph lookup over a nodes.jsonl + edges.jsonl memory graph.">
+    <div class="card-head"><h3>query_graph</h3><span class="pill sonnet">tool</span></div>
+    <div class="sub">callable via /mcp</div>
+    <p>1-hop subgraph lookup over a nodes.jsonl + edges.jsonl memory graph.</p>
+  </article>
+  <article class="card" data-search="memory_graph_add append a node or edge (depends_on, supersedes, decided_by, ...) to the graph.">
+    <div class="card-head"><h3>memory_graph_add</h3><span class="pill sonnet">tool</span></div>
+    <div class="sub">callable via /mcp</div>
+    <p>Append a node or edge (depends_on, supersedes, decided_by, ...) to the graph.</p>
+  </article>
+  <article class="card" data-search="placeholder_scan find unfilled &lt;placeholder&gt; markers in claude.md / context.md.">
+    <div class="card-head"><h3>placeholder_scan</h3><span class="pill sonnet">tool</span></div>
+    <div class="sub">callable via /mcp</div>
+    <p>Find unfilled &lt;PLACEHOLDER&gt; markers in CLAUDE.md / CONTEXT.md.</p>
+  </article></div>
+  </section>
+  
+  <section id="hooks">
+    <h2>Active hooks <span class="count">4</span></h2>
+    <div class="grid">
+  <article class="card" data-search="block-dangerous-bash.sh toolkit: dangerous-command guard">
+    <div class="card-head"><h3>block-dangerous-bash.sh</h3><span class="pill haiku">hook</span></div>
+    <div class="sub">PreToolUse  ·  Bash</div>
+    <p>toolkit: dangerous-command guard</p>
+  </article>
+  <article class="card" data-search="block-global-pip.sh toolkit: env-isolation guard">
+    <div class="card-head"><h3>block-global-pip.sh</h3><span class="pill haiku">hook</span></div>
+    <div class="sub">PreToolUse  ·  Bash</div>
+    <p>toolkit: env-isolation guard</p>
+  </article>
+  <article class="card" data-search="format-on-write.sh toolkit: format-on-write">
+    <div class="card-head"><h3>format-on-write.sh</h3><span class="pill haiku">hook</span></div>
+    <div class="sub">PostToolUse  ·  Edit|Write</div>
+    <p>toolkit: format-on-write</p>
+  </article>
+  <article class="card" data-search="session-briefing.sh toolkit: git session briefing">
+    <div class="card-head"><h3>session-briefing.sh</h3><span class="pill haiku">hook</span></div>
+    <div class="sub">SessionStart  ·  startup|resume</div>
+    <p>toolkit: git session briefing</p>
+  </article></div>
+  </section>
+  
+  <section id="commands">
+    <h2>Commands <span class="count">1</span></h2>
+    <div class="grid">
+  <article class="card" data-search="/toolkit-init bootstrap the current project with claude-toolkit templates (claude.md, context.md, settings.local.json, .gitignore) — idempotent, never overwrites without --force.">
+    <div class="card-head"><h3>/toolkit-init</h3><span class="pill opus">cmd</span></div>
+    
+    <p>Bootstrap the current project with claude-toolkit templates (CLAUDE.md, CONTEXT.md, settings.local.json, .gitignore) — idempotent, never overwrites without --force.</p>
+  </article></div>
+  </section>
+  <div class="empty" id="empty">No matches.</div>
+</main>
+
+<footer>
+  Install: <code>/plugin marketplace add github:Praneeth-496/claude-toolkit</code> then <code>/plugin install claude-toolkit</code>.
+  Regenerate this page with <code>node dashboard/build.mjs</code>.
+</footer>
+
+<script>
+  const q = document.getElementById('q'), cards = [...document.querySelectorAll('.card')],
+        empty = document.getElementById('empty'), main = document.querySelector('main');
+  q.addEventListener('input', () => {
+    const t = q.value.trim().toLowerCase(); let shown = 0;
+    for (const c of cards){ const hit = !t || c.dataset.search.includes(t); c.style.display = hit ? '' : 'none'; if(hit) shown++; }
+    for (const s of document.querySelectorAll('section')){
+      const any = [...s.querySelectorAll('.card')].some(c => c.style.display !== 'none');
+      s.style.display = any ? '' : 'none';
+    }
+    empty.style.display = shown ? 'none' : 'block';
+  });
+</script>
+</body>
+</html>

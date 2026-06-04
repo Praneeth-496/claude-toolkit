@@ -1,0 +1,17 @@
+# Node / MCP server deps — installed per-machine via `npm install` in claude-toolkit/mcp/
+node_modules/
+claude-toolkit/mcp/node_modules/
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Local machine state
+.cc10x/
+
+# Local runtime artefacts (ruflo/ruvector memory DB, etc.) — never commit
+ruvector.db
+*.db
+*.sqlite
+*.sqlite3
