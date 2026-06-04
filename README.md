@@ -1,3 +1,15 @@
+<p align="center">
+  <a href="https://raw.githack.com/Praneeth-496/claude-toolkit/main/claude-toolkit/dashboard/dashboard.html">
+    <img src="assets/dashboard.png" alt="claude-toolkit dashboard — skills, review agents, hooks, and MCP tools" width="100%">
+  </a>
+</p>
+
+<p align="center">
+  <b><a href="https://raw.githack.com/Praneeth-496/claude-toolkit/main/claude-toolkit/dashboard/dashboard.html">▶ Open the live dashboard</a></b>
+  &nbsp;·&nbsp;
+  <a href="assets/dashboard.png">View full-size screenshot</a>
+</p>
+
 # claude-toolkit
 
 Portable Claude Code context, skills, and guard rails. Drop the [`claude-toolkit/`](claude-toolkit/) folder onto any machine, run [`install.sh`](claude-toolkit/install.sh) in a project, and that project gets the same disciplined setup: a tiny always-loaded `CLAUDE.md`, a lazy-loaded `CONTEXT.md`, sane permissions, and a curated set of user-scope skills.
