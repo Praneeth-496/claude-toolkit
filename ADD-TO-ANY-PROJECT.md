@@ -6,18 +6,23 @@ Two ways. **Use the plugin** (recommended — set up once, live in every project
 
 ## Option A — Plugin (recommended, zero per-project setup)
 
-Do this **once** on a machine, inside any Claude Code session:
+> **These are Claude Code slash commands, NOT bash commands.** Start Claude Code first
+> (run `claude` in your terminal, or open the IDE extension), then type the lines below
+> at the Claude Code prompt — not at your shell `$` prompt. Typing `/plugin` in bash gives
+> `bash: /plugin: No such file or directory`.
+
+Do this **once** on a machine, inside a Claude Code session:
 
 ```text
 /plugin marketplace add github:Praneeth-496/claude-toolkit
 /plugin install claude-toolkit
 ```
 
-Restart the session. That's it. From now on, **every project you open** automatically has:
+Restart the session (or run `/reload-plugins`). That's it. From now on, **every project you open** automatically has:
 
-- 24 auto-routing skills (memory graph, council, verify-claim, slurm, sync, 10x, scout, ...)
+- 25 auto-routing skills (memory graph, council, verify-claim, slurm, sync, env-bootstrap, 10x, scout, ...)
 - 8 review subagents (adversary, code-reviewer, fact-checker, ...)
-- 3 safety hooks (block dangerous bash, format-on-write, git session briefing)
+- 4 safety hooks (block dangerous bash, block global pip, format-on-write, git session briefing)
 - 4 MCP tools (`verify_result_claim`, `query_graph`, `memory_graph_add`, `placeholder_scan`)
 
 No `npm install`, no copying files. The MCP server is dependency-free (plain Node ≥18).

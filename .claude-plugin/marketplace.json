@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-toolkit-marketplace",
+  "owner": {
+    "name": "Praneeth Dathu",
+    "url": "https://github.com/Praneeth-496"
+  },
+  "plugins": [
+    {
+      "name": "claude-toolkit",
+      "source": "./claude-toolkit",
+      "version": "0.5.0",
+      "description": "Portable Claude Code toolkit: 25 skills, 8 review agents, safety hooks, /toolkit-init, and a bundled zero-dependency MCP server (verify_result_claim, query_graph, memory_graph_add, placeholder_scan)."
+    }
+  ]
+}
