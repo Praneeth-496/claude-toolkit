@@ -321,4 +321,4 @@ Verified against the official Claude Code docs ([hooks](https://code.claude.com/
 
 ## License
 
-Personal toolkit, no formal licence. Use freely.
+[MIT-0](LICENSE) (MIT No Attribution) — use, copy, modify, and redistribute freely, no attribution required. Matches the `license` field in [`plugin.json`](claude-toolkit/.claude-plugin/plugin.json).
